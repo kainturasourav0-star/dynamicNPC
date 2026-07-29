@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/db";
+import { db, eq } from "@/db";
 import { users, projects } from "@/db/schema";
-import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
+
 
 export async function POST(req: NextRequest) {
   try {

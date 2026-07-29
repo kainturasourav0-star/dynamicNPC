@@ -1,7 +1,7 @@
-import { db } from "@/db";
+import { db, eq } from "@/db";
 import { users } from "@/db/schema";
 import { cookies } from "next/headers";
-import { eq } from "drizzle-orm";
+
 
 export async function getSessionUser() {
   const cookieStore = await cookies();

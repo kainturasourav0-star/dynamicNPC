@@ -3,12 +3,5 @@
   "framework": "nextjs",
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
-  "installCommand": "npm install",
-  "env": {
-    "DATABASE_URL": "@database_url",
-    "NVIDIA_API_KEY": "@nvidia_api_key",
-    "NVIDIA_ENDPOINT": "@nvidia_endpoint",
-    "NVIDIA_MODEL": "@nvidia_model",
-    "NEXT_PUBLIC_APP_URL": "@next_public_app_url"
-  }
+  "installCommand": "npm install"
 }

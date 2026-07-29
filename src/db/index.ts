@@ -1,5 +1,5 @@
 // No direct import needed; re-export schema below
-import { mockDb } from "./mock-db.js";
+import { mockDb } from "./mock-db";
 
 // Use mock database since Postgres is not running locally on port 5432
 export const db: any = mockDb;
@@ -20,5 +20,5 @@ export function desc(column: any) {
   return { desc: columnName };
 }
 
-export * from "./schema.js";
+export * from "./schema";
 export { pgTable, uuid, varchar, text, boolean, timestamp, jsonb, decimal } from "drizzle-orm/pg-core";

@@ -34,3 +34,5 @@ db-state.json
 
 # Scratch / test files
 scratch/
+
+.vercel

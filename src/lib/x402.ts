@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
-import { db, eq } from "../db/index.ts";
-import { spentNonces } from "../db/schema.ts";
+import { db, eq } from "../db/index";
+import { spentNonces } from "../db/schema";
 
 export interface X402Challenge {
   requestId: string;

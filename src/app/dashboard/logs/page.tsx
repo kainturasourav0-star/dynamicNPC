@@ -101,7 +101,10 @@ export default function LogsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-cyan-400"></div>
+          <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">Loading Logs...</span>
+        </div>
       </div>
     );
   }
@@ -109,32 +112,33 @@ export default function LogsPage() {
   return (
     <div className="space-y-8 max-w-6xl">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-extrabold text-slate-100 flex items-center gap-3">
-          <Terminal className="w-8 h-8 text-indigo-400" />
+      <div className="border-b border-[#2F323B] pb-6">
+        <p className="font-mono text-cyan-400 text-[10px] uppercase tracking-[0.3em] mb-2">Request History</p>
+        <h1 className="text-3xl font-black tracking-tighter text-white uppercase flex items-center gap-3">
+          <Terminal className="w-7 h-7 text-cyan-400" />
           Dialogue Request Logs
         </h1>
         <p className="text-slate-400 text-sm mt-1">
-          Inspect incoming game requests, generated AI responses, and corresponding x402 USDC micropayment receipts.
+          Inspect incoming game requests, generated AI responses, and x402 USDC micropayment receipts.
         </p>
       </div>
 
       {logs.length === 0 ? (
-        <div className="text-center py-20 bg-slate-900 border border-slate-800 rounded-xl">
-          <div className="p-4 bg-slate-950/60 rounded-full inline-block mb-4 text-slate-600">
+        <div className="text-center py-20 bg-[#0c0c0c] border border-dashed border-[#2F323B]">
+          <div className="p-4 inline-block mb-4 text-slate-700">
             <Terminal className="w-12 h-12" />
           </div>
-          <h3 className="text-lg font-bold text-slate-200">No logs recorded</h3>
-          <p className="text-slate-500 text-sm mt-1 max-w-md mx-auto">
-            Once you call `/api/generate-dialogue` from your game client, requests and transaction receipts will be logged here.
+          <h3 className="text-sm font-bold text-slate-200 font-mono uppercase tracking-wider">No Logs Recorded</h3>
+          <p className="text-slate-500 text-sm mt-2 max-w-md mx-auto">
+            Once you call the <code className="text-cyan-400">/api/generate-dialogue</code> endpoint from your game, request logs will appear here.
           </p>
         </div>
       ) : (
-        <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+        <div className="bg-[#0c0c0c] border border-[#2F323B] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-800 text-xs text-slate-400 uppercase tracking-wider font-mono bg-slate-950/40">
+                <tr className="border-b border-[#2F323B] text-[9px] text-slate-400 uppercase tracking-[0.2em] font-mono bg-[#050505]">
                   <th className="p-4">Request ID</th>
                   <th className="p-4">NPC Character</th>
                   <th className="p-4">Payment Status</th>
@@ -146,12 +150,12 @@ export default function LogsPage() {
               </thead>
               <tbody>
                 {logs.map((log) => (
-                  <tr key={log.id} className="border-b border-slate-800/40 text-sm text-slate-300 hover:bg-slate-800/20 transition">
-                    <td className="p-4 font-mono text-xs text-slate-400">{log.id.substring(0, 8)}...</td>
-                    <td className="p-4 font-semibold text-slate-200">{log.npcName}</td>
+                  <tr key={log.id} className="border-b border-[#2F323B]/40 text-sm text-slate-300 hover:bg-white/2 transition">
+                    <td className="p-4 font-mono text-[10px] text-slate-500">{log.id.substring(0, 8)}...</td>
+                    <td className="p-4 font-bold text-slate-200 text-xs uppercase tracking-tight">{log.npcName}</td>
                     <td className="p-4">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${
+                        className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-[9px] font-mono uppercase tracking-wider border ${
                           log.status === "PAID_COMPLETED"
                             ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                             : log.status === "CHALLENGE_ISSUED"
@@ -160,34 +164,25 @@ export default function LogsPage() {
                         }`}
                       >
                         {log.status === "PAID_COMPLETED" ? (
-                          <>
-                            <ShieldCheck className="w-3.5 h-3.5" />
-                            Paid
-                          </>
+                          <><ShieldCheck className="w-3 h-3" /> Paid</>
                         ) : log.status === "CHALLENGE_ISSUED" ? (
-                          <>
-                            <AlertCircle className="w-3.5 h-3.5 animate-pulse" />
-                            Payment Required
-                          </>
+                          <><AlertCircle className="w-3 h-3 animate-pulse" /> Challenged</>
                         ) : (
-                          <>
-                            <AlertCircle className="w-3.5 h-3.5" />
-                            Failed
-                          </>
+                          <><AlertCircle className="w-3 h-3" /> Failed</>
                         )}
                       </span>
                     </td>
-                    <td className="p-4 font-mono">${parseFloat(log.cost).toFixed(4)}</td>
-                    <td className="p-4 font-mono text-slate-500 text-xs">
+                    <td className="p-4 font-mono text-xs text-cyan-400">${parseFloat(log.cost).toFixed(4)}</td>
+                    <td className="p-4 font-mono text-slate-500 text-[10px]">
                       {log.txHash ? `${log.txHash.substring(0, 8)}...` : "—"}
                     </td>
-                    <td className="p-4 text-xs text-slate-400">
+                    <td className="p-4 text-[10px] text-slate-400 font-mono">
                       {new Date(log.createdAt).toLocaleString()}
                     </td>
                     <td className="p-4 text-right">
                       <button
                         onClick={() => handleInspectLog(log.id)}
-                        className="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-700 text-indigo-400 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition"
+                        className="inline-flex items-center gap-1.5 bg-[#141414] hover:bg-cyan-400/10 text-cyan-400 text-[9px] font-mono uppercase tracking-wider px-3 py-1.5 border border-[#2F323B] hover:border-cyan-400/30 transition"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         Inspect
@@ -201,23 +196,24 @@ export default function LogsPage() {
         </div>
       )}
 
-      {/* Log Detail Modal */}
+      {/* Log Detail Slide Panel */}
       {selectedLogId && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-end z-50 transition duration-300">
-          <div className="bg-slate-900 border-l border-slate-800 w-full max-w-2xl h-screen shadow-2xl flex flex-col justify-between relative animate-slideLeft">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-end z-50">
+          <div className="bg-[#0c0c0c] border-l border-[#2F323B] w-full max-w-2xl h-screen shadow-2xl flex flex-col justify-between relative">
             
             {/* Header */}
-            <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-950/40">
+            <div className="p-6 border-b border-[#2F323B] flex justify-between items-center bg-[#050505]">
               <div>
-                <h3 className="font-bold text-lg text-slate-100 flex items-center gap-2">
-                  <Terminal className="w-5 h-5 text-indigo-400" />
+                <p className="font-mono text-cyan-400 text-[10px] uppercase tracking-[0.3em] mb-1">Request Inspector</p>
+                <h3 className="font-black text-sm text-slate-100 uppercase tracking-tight flex items-center gap-2">
+                  <Terminal className="w-4 h-4 text-cyan-400" />
                   Inspect Request
                 </h3>
-                <span className="text-xs text-slate-500 font-mono">ID: {selectedLogId}</span>
+                <span className="text-[10px] text-slate-500 font-mono">ID: {selectedLogId}</span>
               </div>
               <button
                 onClick={() => setSelectedLogId(null)}
-                className="p-1 text-slate-400 hover:text-slate-200 transition"
+                className="p-1 text-slate-400 hover:text-white transition"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -226,44 +222,45 @@ export default function LogsPage() {
             {/* Scrollable details */}
             <div className="flex-1 overflow-y-auto p-6 space-y-8">
               {loadingDetail ? (
-                <div className="flex items-center justify-center h-full">
-                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+                <div className="flex flex-col items-center justify-center h-full gap-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-cyan-400"></div>
+                  <span className="font-mono text-[10px] uppercase text-slate-500">Loading detail...</span>
                 </div>
               ) : logDetail ? (
-                <div className="space-y-8">
+                <div className="space-y-6">
                   {/* NPC and Info */}
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-slate-950 p-4 rounded-xl border border-slate-800/60">
-                      <span className="text-[10px] text-slate-500 font-mono uppercase block mb-1">NPC Profile</span>
-                      <div className="font-bold text-slate-200 flex items-center gap-1.5">
-                        <Bot className="w-4 h-4 text-indigo-400" />
+                    <div className="bg-[#050505] p-4 border border-[#2F323B]">
+                      <span className="text-[9px] text-slate-500 font-mono uppercase tracking-widest block mb-1">NPC Profile</span>
+                      <div className="font-bold text-slate-200 flex items-center gap-1.5 text-sm">
+                        <Bot className="w-4 h-4 text-cyan-400" />
                         {logDetail.npc?.name || "Unknown"}
                       </div>
-                      <span className="text-[11px] text-slate-400 font-mono">Tone: {logDetail.npc?.tone}</span>
+                      <span className="text-[10px] text-slate-400 font-mono">Tone: {logDetail.npc?.tone}</span>
                     </div>
 
-                    <div className="bg-slate-950 p-4 rounded-xl border border-slate-800/60">
-                      <span className="text-[10px] text-slate-500 font-mono uppercase block mb-1">API Cost</span>
-                      <div className="font-bold text-slate-200 flex items-center gap-1">
-                        <Coins className="w-4 h-4 text-amber-400" />
+                    <div className="bg-[#050505] p-4 border border-[#2F323B]">
+                      <span className="text-[9px] text-slate-500 font-mono uppercase tracking-widest block mb-1">API Cost</span>
+                      <div className="font-bold text-slate-200 flex items-center gap-1 text-sm">
+                        <Coins className="w-4 h-4 text-lime-400" />
                         ${parseFloat(logDetail.cost).toFixed(4)} USDC
                       </div>
-                      <span className="text-[11px] text-slate-400">Standard metered rate</span>
+                      <span className="text-[10px] text-slate-400">Standard metered rate</span>
                     </div>
                   </div>
 
                   {/* Context and Input */}
                   <div className="space-y-2">
-                    <h4 className="text-xs font-mono uppercase text-slate-400 tracking-wider">Input Request Context</h4>
-                    <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 space-y-4">
+                    <h4 className="text-[9px] font-mono uppercase text-slate-400 tracking-widest">Input Request Context</h4>
+                    <div className="bg-[#050505] border border-[#2F323B] p-4 space-y-4">
                       <div>
-                        <span className="text-[10px] text-slate-500 font-mono uppercase block mb-1">Game Scenario Context</span>
+                        <span className="text-[9px] text-slate-500 font-mono uppercase tracking-widest block mb-1">Game Scenario</span>
                         <p className="text-slate-300 text-sm leading-relaxed">{logDetail.rawRequest.context}</p>
                       </div>
                       {logDetail.rawRequest.playerState && (
                         <div>
-                          <span className="text-[10px] text-slate-500 font-mono uppercase block mb-1">Player Attributes</span>
-                          <pre className="text-xs font-mono text-indigo-300 bg-slate-950 p-2.5 rounded border border-slate-800 overflow-x-auto">
+                          <span className="text-[9px] text-slate-500 font-mono uppercase tracking-widest block mb-1">Player Attributes</span>
+                          <pre className="text-xs font-mono text-cyan-300 bg-black/40 p-2.5 border border-[#2F323B] overflow-x-auto">
                             {JSON.stringify(logDetail.rawRequest.playerState, null, 2)}
                           </pre>
                         </div>
@@ -274,38 +271,38 @@ export default function LogsPage() {
                   {/* Generated output */}
                   {logDetail.status === "PAID_COMPLETED" && logDetail.rawResponse?.dialogue ? (
                     <div className="space-y-2">
-                      <h4 className="text-xs font-mono uppercase text-slate-400 tracking-wider">Generated Dialogue Options</h4>
+                      <h4 className="text-[9px] font-mono uppercase text-slate-400 tracking-widest">Generated Dialogue Options</h4>
                       <div className="space-y-3">
                         {logDetail.rawResponse.dialogue.map((opt, index) => (
-                          <div key={index} className="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-2">
+                          <div key={index} className="bg-[#050505] border border-[#2F323B] p-4 space-y-2">
                             <div className="flex justify-between items-center">
-                              <span className="text-[10px] font-mono text-indigo-400 bg-indigo-500/10 border border-indigo-500/25 px-2 py-0.5 rounded">
+                              <span className="text-[9px] font-mono text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 uppercase tracking-wider">
                                 Option {index + 1}
                               </span>
-                              <span className="text-xs text-slate-400">Emotion: <strong className="text-indigo-300">{opt.emotion}</strong></span>
+                              <span className="text-[10px] text-slate-400 font-mono">Emotion: <strong className="text-cyan-300">{opt.emotion}</strong></span>
                             </div>
-                            <p className="text-slate-200 text-sm leading-relaxed font-sans">{opt.text}</p>
+                            <p className="text-slate-200 text-sm leading-relaxed">{opt.text}</p>
                           </div>
                         ))}
                       </div>
                     </div>
                   ) : (
-                    <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl text-center text-slate-500 text-sm">
-                      Dialogue output is not available. This request has status: <code className="text-indigo-400">{logDetail.status}</code>.
+                    <div className="p-4 bg-[#050505] border border-[#2F323B] text-center text-slate-500 text-sm font-mono">
+                      Dialogue output not available. Status: <code className="text-cyan-400">{logDetail.status}</code>
                     </div>
                   )}
 
                   {/* Payment Receipt */}
                   {logDetail.receipt && (
                     <div className="space-y-2">
-                      <h4 className="text-xs font-mono uppercase text-slate-400 tracking-wider">x402 Transaction Receipt</h4>
-                      <div className="bg-gradient-to-br from-emerald-600/10 to-teal-600/10 border border-emerald-500/20 p-5 rounded-xl space-y-4 font-mono text-xs relative overflow-hidden">
-                        <div className="flex justify-between items-center pb-2 border-b border-slate-800">
+                      <h4 className="text-[9px] font-mono uppercase text-slate-400 tracking-widest">x402 Transaction Receipt</h4>
+                      <div className="bg-emerald-500/5 border border-emerald-500/20 p-5 space-y-4 font-mono text-xs">
+                        <div className="flex justify-between items-center pb-2 border-b border-[#2F323B]">
                           <span className="font-bold text-emerald-400 flex items-center gap-1.5">
                             <ShieldCheck className="w-4 h-4" />
                             SETTLED RECEIPT
                           </span>
-                          <span className="text-[10px] text-slate-500">
+                          <span className="text-[9px] text-slate-500 uppercase">
                             {new Date(logDetail.receipt.createdAt).toLocaleString()}
                           </span>
                         </div>
@@ -318,21 +315,21 @@ export default function LogsPage() {
                           <span className="col-span-2 text-slate-300 truncate">{logDetail.receipt.payload.payerAddress}</span>
 
                           <span className="text-slate-500">USDC Amount:</span>
-                          <span className="col-span-2 text-slate-300 font-bold">${parseFloat(logDetail.receipt.payload.amount).toFixed(4)} USDC</span>
+                          <span className="col-span-2 text-lime-400 font-bold">${parseFloat(logDetail.receipt.payload.amount).toFixed(4)} USDC</span>
 
                           <span className="text-slate-500">Tx Hash:</span>
                           <span className="col-span-2 text-slate-400 truncate flex items-center gap-1">
                             {logDetail.receipt.transactionHash}
                             <button
                               onClick={() => handleCopy(logDetail.receipt!.transactionHash, "tx")}
-                              className="p-0.5 hover:bg-slate-800 rounded text-slate-500 hover:text-slate-300"
+                              className="p-0.5 hover:bg-white/10 text-slate-500 hover:text-white transition"
                             >
-                              {copiedId === "tx" ? <Check className="w-3 h-3 text-emerald-400" /> : <Clipboard className="w-3 h-3" />}
+                              {copiedId === "tx" ? <Check className="w-3 h-3 text-lime-400" /> : <Clipboard className="w-3 h-3" />}
                             </button>
                           </span>
                         </div>
 
-                        <div className="pt-2 border-t border-slate-800/80 text-[10px] text-slate-500">
+                        <div className="pt-2 border-t border-[#2F323B] text-[9px] text-slate-500">
                           Signature: <span className="text-slate-400 break-all">{logDetail.receipt.signature.substring(0, 40)}...</span>
                         </div>
                       </div>
@@ -343,12 +340,12 @@ export default function LogsPage() {
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-slate-800 bg-slate-950/40 flex justify-end">
+            <div className="p-4 border-t border-[#2F323B] bg-[#050505] flex justify-end">
               <button
                 onClick={() => setSelectedLogId(null)}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm transition text-slate-300 font-semibold"
+                className="px-5 py-2.5 bg-[#141414] hover:bg-white/10 text-xs font-mono uppercase border border-white/5 transition"
               >
-                Close
+                Close Panel
               </button>
             </div>
           </div>

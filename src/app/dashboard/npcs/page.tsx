@@ -160,7 +160,10 @@ export default function NpcsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-cyan-400"></div>
+          <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">Loading Profiles...</span>
+        </div>
       </div>
     );
   }
@@ -168,10 +171,11 @@ export default function NpcsPage() {
   return (
     <div className="space-y-8 max-w-6xl">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center border-b border-[#2F323B] pb-6">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-100 flex items-center gap-3">
-            <Bot className="w-8 h-8 text-indigo-400" />
+          <p className="font-mono text-cyan-400 text-[10px] uppercase tracking-[0.3em] mb-2">Character Management</p>
+          <h1 className="text-3xl font-black tracking-tighter text-white uppercase flex items-center gap-3">
+            <Bot className="w-7 h-7 text-cyan-400" />
             NPC Dialogue Profiles
           </h1>
           <p className="text-slate-400 text-sm mt-1">
@@ -180,60 +184,60 @@ export default function NpcsPage() {
         </div>
         <button
           onClick={handleOpenCreate}
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_15px_rgba(79,70,229,0.3)] transition px-4 py-2.5 rounded-lg text-sm font-semibold"
+          className="flex items-center gap-2 bg-cyan-400 hover:bg-white text-black transition px-5 py-2.5 rounded-none text-xs font-mono uppercase tracking-wider font-bold"
         >
           <Plus className="w-4 h-4" />
-          Create NPC Profile
+          Create Profile
         </button>
       </div>
 
       {npcs.length === 0 ? (
-        <div className="text-center py-20 bg-slate-900 border border-slate-800 rounded-xl max-w-4xl mx-auto">
-          <div className="p-4 bg-slate-950/60 rounded-full inline-block mb-4 text-slate-600">
+        <div className="text-center py-20 bg-[#0c0c0c] border border-dashed border-[#2F323B] max-w-4xl mx-auto">
+          <div className="p-4 inline-block mb-4 text-slate-600">
             <Bot className="w-12 h-12" />
           </div>
-          <h3 className="text-lg font-bold text-slate-200">No NPC Profiles Configured</h3>
-          <p className="text-slate-500 text-sm mt-1 max-w-md mx-auto px-4">
-            AI NPCs require a set backstory and personality profile so that dialogue is generated contextually. Let's create your first profile.
+          <h3 className="text-sm font-bold text-slate-200 font-mono uppercase tracking-wider">No NPC Profiles Configured</h3>
+          <p className="text-slate-500 text-sm mt-2 max-w-md mx-auto px-4">
+            AI NPCs require a set backstory and personality profile so that dialogue is generated contextually.
           </p>
           <button
             onClick={handleOpenCreate}
-            className="mt-6 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition px-4 py-2 rounded-lg text-sm"
+            className="mt-6 bg-cyan-400 hover:bg-white text-black font-bold transition px-6 py-2.5 rounded-none text-xs font-mono uppercase tracking-wider"
           >
             + Create NPC Profile
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {npcs.map((npc) => (
             <div
               key={npc.id}
-              className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col justify-between hover:border-slate-700/80 transition duration-300 relative group"
+              className="bg-[#0c0c0c] border border-[#2F323B] p-6 flex flex-col justify-between hover:border-cyan-400/40 transition duration-300 relative group"
             >
               <div>
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="font-bold text-lg text-slate-100">{npc.name}</h3>
-                    <div className="flex gap-2 flex-wrap items-center mt-1">
-                      <span className="text-[10px] font-mono bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20">
-                        Tone: {npc.tone}
+                    <h3 className="font-bold text-base text-slate-100 uppercase tracking-tight">{npc.name}</h3>
+                    <div className="flex gap-2 flex-wrap items-center mt-2">
+                      <span className="text-[9px] font-mono bg-cyan-500/10 text-cyan-400 px-2 py-0.5 border border-cyan-500/20 uppercase tracking-wider">
+                        {npc.tone}
                       </span>
-                      <span className="text-[10px] font-mono bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">
-                        Cost: ${parseFloat(npc.cost || "0.0100").toFixed(4)} USDC
+                      <span className="text-[9px] font-mono bg-lime-500/10 text-lime-400 px-2 py-0.5 border border-lime-500/20 uppercase tracking-wider">
+                        ${parseFloat(npc.cost || "0.0100").toFixed(4)} USDC
                       </span>
                     </div>
                   </div>
                   <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition duration-200">
                     <button
                       onClick={() => handleOpenEdit(npc)}
-                      className="p-1.5 bg-slate-800 hover:bg-indigo-600/30 text-indigo-400 hover:text-indigo-300 rounded-lg transition"
+                      className="p-1.5 bg-[#141414] hover:bg-cyan-400/10 text-cyan-400 transition border border-transparent hover:border-cyan-400/20"
                       title="Edit NPC"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(npc.id)}
-                      className="p-1.5 bg-slate-800 hover:bg-rose-600/30 text-rose-400 hover:text-rose-300 rounded-lg transition"
+                      className="p-1.5 bg-[#141414] hover:bg-rose-500/10 text-rose-400 transition border border-transparent hover:border-rose-500/20"
                       title="Delete NPC"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -241,10 +245,10 @@ export default function NpcsPage() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div>
-                    <span className="text-[10px] text-slate-500 font-mono uppercase block mb-1">Backstory</span>
-                    <p className="text-slate-300 text-xs leading-relaxed line-clamp-3 bg-slate-950/40 p-2.5 rounded border border-slate-800/40">
+                    <span className="text-[9px] text-slate-500 font-mono uppercase tracking-widest block mb-1">Backstory</span>
+                    <p className="text-slate-300 text-xs leading-relaxed line-clamp-3 bg-black/20 p-2.5 border border-[#2F323B]">
                       {npc.backstory}
                     </p>
                   </div>
@@ -253,14 +257,14 @@ export default function NpcsPage() {
                     <div className="grid grid-cols-2 gap-4 text-xs">
                       {npc.style && (
                         <div>
-                          <span className="text-[10px] text-slate-500 font-mono uppercase block mb-1">Style</span>
-                          <p className="text-slate-400 truncate">{npc.style}</p>
+                          <span className="text-[9px] text-slate-500 font-mono uppercase tracking-widest block mb-1">Style</span>
+                          <p className="text-slate-400 truncate text-xs">{npc.style}</p>
                         </div>
                       )}
                       {npc.safetyRules && (
                         <div>
-                          <span className="text-[10px] text-slate-500 font-mono uppercase block mb-0.5">Safety Constraints</span>
-                          <p className="text-rose-400/80 truncate flex items-center gap-1">
+                          <span className="text-[9px] text-slate-500 font-mono uppercase tracking-widest block mb-1">Safety</span>
+                          <p className="text-rose-400/80 truncate flex items-center gap-1 text-xs">
                             <ShieldAlert className="w-3 h-3 flex-shrink-0" />
                             Active
                           </p>
@@ -271,9 +275,9 @@ export default function NpcsPage() {
                 </div>
               </div>
 
-              <div className="border-t border-slate-800/40 mt-6 pt-4 flex justify-between items-center text-[10px] font-mono text-slate-500">
-                <span>NPC ID: {npc.id}</span>
-                <span>Configured: {new Date(npc.createdAt).toLocaleDateString()}</span>
+              <div className="border-t border-[#2F323B] mt-5 pt-3 flex justify-between items-center text-[9px] font-mono text-slate-600">
+                <span>ID: {npc.id.substring(0, 12)}...</span>
+                <span>{new Date(npc.createdAt).toLocaleDateString()}</span>
               </div>
             </div>
           ))}
@@ -282,27 +286,27 @@ export default function NpcsPage() {
 
       {/* Edit/Create Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto p-4">
-          <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl w-full max-w-lg shadow-2xl relative my-8">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 overflow-y-auto p-4">
+          <div className="bg-[#0c0c0c] border border-[#2F323B] p-8 rounded-none w-full max-w-lg shadow-2xl relative my-8">
             <button
               onClick={() => setShowModal(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-200 transition"
+              className="absolute top-4 right-4 text-slate-400 hover:text-white transition"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="font-bold text-xl text-slate-100 flex items-center gap-2 mb-6">
-              <Sparkles className="w-5 h-5 text-indigo-400" />
+            <h3 className="font-black text-lg text-slate-100 uppercase tracking-tight flex items-center gap-2 mb-6">
+              <Sparkles className="w-5 h-5 text-cyan-400" />
               {editingNpc ? "Edit NPC Profile" : "Create NPC Profile"}
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {!editingNpc && (
                 <div>
-                  <label className="text-xs text-indigo-400 font-mono block mb-1">Prepopulate from Preset Template</label>
+                  <label className="text-[10px] text-cyan-400 font-mono uppercase tracking-wider block mb-1">Preset Template</label>
                   <select
                     onChange={(e) => handleSelectPreset(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-350 focus:outline-none focus:border-indigo-500 transition"
+                    className="w-full bg-[#050505] border border-[#2F323B] rounded-none px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-cyan-400 transition"
                   >
                     {NPC_PRESETS.map((p) => (
                       <option key={p.name} value={p.name}>{p.name}</option>
@@ -311,36 +315,36 @@ export default function NpcsPage() {
                 </div>
               )}
               <div>
-                <label className="text-xs text-slate-400 font-mono block mb-1">Name</label>
+                <label className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block mb-1">Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Eldon the Merchant"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition"
+                  className="w-full bg-[#050505] border border-[#2F323B] rounded-none px-3 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-cyan-400 transition placeholder-slate-700"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-slate-400 font-mono block mb-1">Backstory & History</label>
+                <label className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block mb-1">Backstory & History</label>
                 <textarea
                   required
                   rows={4}
-                  placeholder="e.g. A veteran weapon merchant who survived the Great Siege of Oakhaven. Speaks grumpily but has a soft heart for adventurers."
+                  placeholder="e.g. A veteran weapon merchant who survived the Great Siege of Oakhaven."
                   value={backstory}
                   onChange={(e) => setBackstory(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition resize-none"
+                  className="w-full bg-[#050505] border border-[#2F323B] rounded-none px-3 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-cyan-400 transition resize-none placeholder-slate-700"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-slate-400 font-mono block mb-1">Tone</label>
+                  <label className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block mb-1">Tone</label>
                   <select
                     value={tone}
                     onChange={(e) => setTone(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-indigo-500 transition"
+                    className="w-full bg-[#050505] border border-[#2F323B] rounded-none px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-cyan-400 transition"
                   >
                     <option value="Neutral">Neutral</option>
                     <option value="Grumpy">Grumpy</option>
@@ -352,19 +356,19 @@ export default function NpcsPage() {
                 </div>
 
                 <div>
-                  <label className="text-xs text-slate-400 font-mono block mb-1">Speaking Style (Optional)</label>
+                  <label className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block mb-1">Speaking Style</label>
                   <input
                     type="text"
-                    placeholder="e.g. Uses medieval slang, stutters slightly"
+                    placeholder="e.g. Uses medieval slang"
                     value={style}
                     onChange={(e) => setStyle(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition"
+                    className="w-full bg-[#050505] border border-[#2F323B] rounded-none px-3 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-cyan-400 transition placeholder-slate-700"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs text-slate-400 font-mono block mb-1">Dialogue USDC Cost (Per Call)</label>
+                <label className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block mb-1">Dialogue USDC Cost (Per Call)</label>
                 <input
                   type="number"
                   step="0.0001"
@@ -373,32 +377,32 @@ export default function NpcsPage() {
                   placeholder="e.g. 0.0100"
                   value={cost}
                   onChange={(e) => setCost(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition"
+                  className="w-full bg-[#050505] border border-[#2F323B] rounded-none px-3 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-cyan-400 transition placeholder-slate-700"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-slate-400 font-mono block mb-1">Safety Constraints (Optional)</label>
+                <label className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block mb-1">Safety Constraints (Optional)</label>
                 <input
                   type="text"
                   placeholder="e.g. Never discuss modern technology, keep PG-13"
                   value={safetyRules}
                   onChange={(e) => setSafetyRules(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition"
+                  className="w-full bg-[#050505] border border-[#2F323B] rounded-none px-3 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-cyan-400 transition placeholder-slate-700"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
+              <div className="flex justify-end gap-3 pt-4 border-t border-[#2F323B]">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm transition"
+                  className="px-5 py-2.5 bg-[#141414] hover:bg-white/10 text-xs font-mono uppercase border border-white/5 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm text-white font-semibold transition"
+                  className="px-5 py-2.5 bg-cyan-400 hover:bg-white text-black text-xs font-mono uppercase font-bold transition"
                 >
                   {editingNpc ? "Save Changes" : "Create Profile"}
                 </button>

@@ -316,10 +316,11 @@ export default function SandboxPage() {
   return (
     <div className="space-y-6 max-w-6xl">
       {/* Header */}
-      <div className="flex justify-between items-center flex-wrap gap-4">
+      <div className="flex justify-between items-center flex-wrap gap-4 border-b border-[#2F323B] pb-6">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-100 flex items-center gap-3">
-            <Play className="w-8 h-8 text-indigo-400" />
+          <p className="font-mono text-cyan-400 text-[10px] uppercase tracking-[0.3em] mb-2">Testing Environment</p>
+          <h1 className="text-3xl font-black tracking-tighter text-white uppercase flex items-center gap-3">
+            <Play className="w-7 h-7 text-cyan-400" />
             Dialogue Sandbox
           </h1>
           <p className="text-slate-400 text-sm mt-1">
@@ -328,34 +329,34 @@ export default function SandboxPage() {
         </div>
 
         {/* Wallet Connector */}
-        <div className="flex items-center gap-3 bg-slate-900 border border-slate-800 p-2 rounded-xl">
+        <div className="flex items-center gap-2 bg-[#0c0c0c] border border-[#2F323B] p-2">
           <button
             onClick={() => setWalletType("simulated")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+            className={`px-3 py-1.5 text-xs font-mono uppercase tracking-wider transition ${
               walletType === "simulated" 
-                ? "bg-indigo-600 text-white" 
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-cyan-400 text-black font-bold" 
+                : "text-slate-400 hover:text-white"
             }`}
           >
-            Simulated Wallet
+            Simulated
           </button>
           
           {browserWalletAddress ? (
-            <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 text-xs text-emerald-400 font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <div className="flex items-center gap-2 bg-[#050505] px-3 py-1.5 border border-lime-500/20 text-xs text-lime-400 font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-lime-500 animate-pulse"></span>
               {browserWalletAddress.substring(0, 6)}...{browserWalletAddress.slice(-4)}
             </div>
           ) : (
             <button
               onClick={connectBrowserWallet}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-dashed transition ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono uppercase tracking-wider border transition ${
                 walletType === "browser" 
-                  ? "border-indigo-500 text-indigo-400" 
-                  : "border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700"
+                  ? "border-cyan-500 text-cyan-400" 
+                  : "border-[#2F323B] text-slate-400 hover:text-white hover:border-slate-600"
               }`}
             >
               <Wallet className="w-3.5 h-3.5" />
-              Connect Browser Wallet
+              Connect Wallet
             </button>
           )}
         </div>
@@ -363,20 +364,23 @@ export default function SandboxPage() {
 
       {loadingNpcs ? (
         <div className="flex items-center justify-center min-h-[50vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+          <div className="flex flex-col items-center gap-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-cyan-400"></div>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">Loading NPCs...</span>
+          </div>
         </div>
       ) : npcs.length === 0 ? (
-        <div className="text-center py-20 bg-slate-900 border border-slate-800 rounded-xl">
-          <div className="p-4 bg-slate-950/60 rounded-full inline-block mb-4 text-slate-600">
+        <div className="text-center py-20 bg-[#0c0c0c] border border-dashed border-[#2F323B]">
+          <div className="p-4 inline-block mb-4 text-slate-600">
             <Bot className="w-12 h-12" />
           </div>
-          <h3 className="text-lg font-bold text-slate-200">No NPC Profiles Available</h3>
-          <p className="text-slate-500 text-sm mt-1 max-w-md mx-auto">
-            You must create at least one NPC profile in the console before you can run the dialogue sandbox.
+          <h3 className="text-sm font-bold text-slate-200 font-mono uppercase tracking-wider">No NPC Profiles Available</h3>
+          <p className="text-slate-500 text-sm mt-2 max-w-md mx-auto">
+            You must create at least one NPC profile before you can run the dialogue sandbox.
           </p>
           <a
             href="/dashboard/npcs"
-            className="mt-6 inline-block bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition px-4 py-2 rounded-lg text-sm"
+            className="mt-6 inline-block bg-cyan-400 hover:bg-white text-black font-bold transition px-6 py-2.5 rounded-none text-xs font-mono uppercase tracking-wider"
           >
             Create NPC Profile
           </a>
@@ -385,15 +389,15 @@ export default function SandboxPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           
           {/* Configurations Sidebar */}
-          <div className="space-y-6 lg:col-span-1">
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
-              <h2 className="text-sm font-bold text-slate-200 font-mono uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-3">
-                <Bot className="w-4 h-4 text-indigo-400" />
+          <div className="space-y-4 lg:col-span-1">
+            <div className="bg-[#0c0c0c] border border-[#2F323B] p-5 space-y-4">
+              <h2 className="text-[10px] font-bold text-slate-200 font-mono uppercase tracking-[0.2em] flex items-center gap-2 border-b border-[#2F323B] pb-3">
+                <Bot className="w-4 h-4 text-cyan-400" />
                 Character & Context
               </h2>
 
               <div>
-                <label className="text-xs text-slate-400 font-mono block mb-1">Target NPC Profile</label>
+                <label className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block mb-1">Target NPC Profile</label>
                 <select
                   value={selectedNpcId}
                   onChange={(e) => {
@@ -402,7 +406,7 @@ export default function SandboxPage() {
                     setDialogueChoices([]);
                     setPipelineStep("idle");
                   }}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition"
+                  className="w-full bg-[#050505] border border-[#2F323B] rounded-none px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-cyan-400 transition"
                 >
                   {npcs.map(n => (
                     <option key={n.id} value={n.id}>{n.name} (Tone: {n.tone})</option>
@@ -411,14 +415,14 @@ export default function SandboxPage() {
               </div>
 
               <div>
-                <label className="text-xs text-slate-400 font-mono block mb-1">Target Blockchain Chain ID</label>
+                <label className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block mb-1">Target Blockchain Chain ID</label>
                 <select
                   value={chainId}
                   onChange={(e) => {
                     setChainId(Number(e.target.value));
                     setPipelineStep("idle");
                   }}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-350 focus:outline-none focus:border-indigo-500 transition"
+                  className="w-full bg-[#050505] border border-[#2F323B] rounded-none px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-cyan-400 transition"
                 >
                   <option value={84532}>Base Sepolia (84532)</option>
                   <option value={11155420}>Optimism Sepolia (11155420)</option>
@@ -427,10 +431,10 @@ export default function SandboxPage() {
               </div>
 
               {activeNpc && (
-                <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800/60 space-y-2">
-                  <div className="flex justify-between items-center text-[10px] font-mono uppercase">
+                <div className="bg-black/20 p-3 border border-[#2F323B] space-y-2">
+                  <div className="flex justify-between items-center text-[9px] font-mono uppercase tracking-wider">
                     <span className="text-slate-500">NPC Backstory</span>
-                    <span className="text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.2 rounded">
+                    <span className="text-lime-400 bg-lime-500/10 border border-lime-500/20 px-1.5 py-0.5">
                       Fee: ${(activeNpc as any).cost || "0.0100"} USDC
                     </span>
                   </div>
@@ -441,33 +445,33 @@ export default function SandboxPage() {
               )}
 
               <div>
-                <label className="text-xs text-slate-400 font-mono block mb-1">Stateful Prompt / Narrative Context</label>
+                <label className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block mb-1">Stateful Prompt / Narrative Context</label>
                 <textarea
                   rows={4}
                   value={context}
                   onChange={(e) => setContext(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 transition resize-none font-sans"
+                  className="w-full bg-[#050505] border border-[#2F323B] rounded-none px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-400 transition resize-none font-sans"
                   placeholder="Describe the initial environment scenario..."
                 />
                 <span className="text-[10px] text-slate-500 mt-1 block">Context appends selected answers to maintain multi-turn memory state.</span>
               </div>
 
               <div>
-                <label className="text-xs text-slate-400 font-mono block mb-1">Player Attributes (JSON)</label>
+                <label className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block mb-1">Player Attributes (JSON)</label>
                 <textarea
                   rows={5}
                   value={playerStateRaw}
                   onChange={(e) => setPlayerStateRaw(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-indigo-300 focus:outline-none focus:border-indigo-500 transition resize-none font-mono"
+                  className="w-full bg-[#050505] border border-[#2F323B] rounded-none px-3 py-2 text-xs text-cyan-300 focus:outline-none focus:border-cyan-400 transition resize-none font-mono"
                   placeholder='{"level": 1}'
                 />
               </div>
             </div>
 
             {/* Step Pipeline Tracker */}
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
-              <h2 className="text-sm font-bold text-slate-200 font-mono uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-3">
-                <Layers className="w-4 h-4 text-emerald-400" />
+            <div className="bg-[#0c0c0c] border border-[#2F323B] p-5 space-y-4">
+              <h2 className="text-[10px] font-bold text-slate-200 font-mono uppercase tracking-[0.2em] flex items-center gap-2 border-b border-[#2F323B] pb-3">
+                <Layers className="w-4 h-4 text-cyan-400" />
                 x402 Protocol Tracker
               </h2>
 
@@ -475,16 +479,16 @@ export default function SandboxPage() {
                 {/* Step 1 */}
                 <div className="flex gap-3">
                   <div className="flex flex-col items-center">
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center border text-[10px] ${
+                    <div className={`w-5 h-5 flex items-center justify-center border text-[9px] font-bold ${
                       pipelineStep === "requesting" 
-                        ? "bg-indigo-600/20 border-indigo-500 text-indigo-400 animate-pulse"
+                        ? "bg-cyan-400/20 border-cyan-400 text-cyan-400 animate-pulse"
                         : pipelineStep !== "idle" && pipelineStep !== "error"
-                        ? "bg-emerald-500/20 border-emerald-500 text-emerald-400"
-                        : "border-slate-800 text-slate-600"
+                        ? "bg-lime-500/20 border-lime-500 text-lime-400"
+                        : "border-[#2F323B] text-slate-600"
                     }`}>
                       1
                     </div>
-                    <div className="w-0.5 h-6 bg-slate-800"></div>
+                    <div className="w-0.5 h-6 bg-[#2F323B]"></div>
                   </div>
                   <div>
                     <span className="text-slate-200 block font-semibold">1. Request Initiation</span>
@@ -495,16 +499,16 @@ export default function SandboxPage() {
                 {/* Step 2 */}
                 <div className="flex gap-3">
                   <div className="flex flex-col items-center">
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center border text-[10px] ${
+                    <div className={`w-5 h-5 flex items-center justify-center border text-[9px] font-bold ${
                       pipelineStep === "challenged" 
                         ? "bg-amber-600/20 border-amber-500 text-amber-400 animate-pulse"
                         : pipelineStep === "signing" || pipelineStep === "settling" || pipelineStep === "completed"
-                        ? "bg-emerald-500/20 border-emerald-500 text-emerald-400"
-                        : "border-slate-800 text-slate-600"
+                        ? "bg-lime-500/20 border-lime-500 text-lime-400"
+                        : "border-[#2F323B] text-slate-600"
                     }`}>
                       2
                     </div>
-                    <div className="w-0.5 h-6 bg-slate-800"></div>
+                    <div className="w-0.5 h-6 bg-[#2F323B]"></div>
                   </div>
                   <div>
                     <span className="text-slate-200 block font-semibold">2. Payment challenge (402)</span>
@@ -515,16 +519,16 @@ export default function SandboxPage() {
                 {/* Step 3 */}
                 <div className="flex gap-3">
                   <div className="flex flex-col items-center">
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center border text-[10px] ${
+                    <div className={`w-5 h-5 flex items-center justify-center border text-[9px] font-bold ${
                       pipelineStep === "signing" 
                         ? "bg-amber-600/20 border-amber-500 text-amber-400 animate-pulse"
                         : pipelineStep === "settling" || pipelineStep === "completed"
-                        ? "bg-emerald-500/20 border-emerald-500 text-emerald-400"
-                        : "border-slate-800 text-slate-600"
+                        ? "bg-lime-500/20 border-lime-500 text-lime-400"
+                        : "border-[#2F323B] text-slate-600"
                     }`}>
                       3
                     </div>
-                    <div className="w-0.5 h-6 bg-slate-800"></div>
+                    <div className="w-0.5 h-6 bg-[#2F323B]"></div>
                   </div>
                   <div>
                     <span className="text-slate-200 block font-semibold">3. Cryptographic Signature</span>
@@ -535,16 +539,16 @@ export default function SandboxPage() {
                 {/* Step 4 */}
                 <div className="flex gap-3">
                   <div className="flex flex-col items-center">
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center border text-[10px] ${
+                    <div className={`w-5 h-5 flex items-center justify-center border text-[9px] font-bold ${
                       pipelineStep === "settling" 
-                        ? "bg-indigo-600/20 border-indigo-500 text-indigo-400 animate-pulse"
+                        ? "bg-cyan-400/20 border-cyan-400 text-cyan-400 animate-pulse"
                         : pipelineStep === "completed"
-                        ? "bg-emerald-500/20 border-emerald-500 text-emerald-400"
-                        : "border-slate-800 text-slate-600"
+                        ? "bg-lime-500/20 border-lime-500 text-lime-400"
+                        : "border-[#2F323B] text-slate-600"
                     }`}>
                       4
                     </div>
-                    <div className="w-0.5 h-6 bg-slate-800"></div>
+                    <div className="w-0.5 h-6 bg-[#2F323B]"></div>
                   </div>
                   <div>
                     <span className="text-slate-200 block font-semibold">4. Settlement Retry</span>
@@ -555,10 +559,10 @@ export default function SandboxPage() {
                 {/* Step 5 */}
                 <div className="flex gap-3">
                   <div className="flex flex-col items-center">
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center border text-[10px] ${
+                    <div className={`w-5 h-5 flex items-center justify-center border text-[9px] font-bold ${
                       pipelineStep === "completed" 
-                        ? "bg-emerald-500/20 border-emerald-500 text-emerald-400"
-                        : "border-slate-800 text-slate-600"
+                        ? "bg-lime-500/20 border-lime-500 text-lime-400"
+                        : "border-[#2F323B] text-slate-600"
                     }`}>
                       5
                     </div>
@@ -571,10 +575,10 @@ export default function SandboxPage() {
               </div>
 
               {pipelineError && (
-                <div className="bg-rose-500/10 border border-rose-500/25 p-3 rounded-lg text-rose-400 text-xs flex gap-2">
+                <div className="bg-rose-500/10 border border-rose-500/25 p-3 text-rose-400 text-xs flex gap-2">
                   <ShieldAlert className="w-4 h-4 flex-shrink-0" />
                   <div>
-                    <span className="font-bold block">Pipeline Interrupted</span>
+                    <span className="font-bold block font-mono uppercase tracking-wider">Pipeline Interrupted</span>
                     {pipelineError}
                   </div>
                 </div>
@@ -583,22 +587,22 @@ export default function SandboxPage() {
           </div>
 
           {/* Interactive Chat Playground & Developer Raw Console */}
-          <div className="space-y-6 lg:col-span-2">
+          <div className="space-y-4 lg:col-span-2">
             
             {/* Dialogue Chat Board */}
-            <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden flex flex-col h-[500px]">
+            <div className="bg-[#0c0c0c] border border-[#2F323B] overflow-hidden flex flex-col h-[500px]">
               
               {/* Top status */}
-              <div className="bg-slate-950/40 p-4 border-b border-slate-800 flex justify-between items-center text-xs">
+              <div className="bg-[#050505] p-4 border-b border-[#2F323B] flex justify-between items-center text-xs">
                 <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></div>
-                  <span className="font-bold text-slate-300">Sandbox Dialogue Playground</span>
+                  <div className="w-2 h-2 bg-cyan-400 animate-pulse"></div>
+                  <span className="font-bold text-slate-300 font-mono uppercase tracking-wider text-[10px]">Sandbox Dialogue Playground</span>
                 </div>
                 <div className="flex items-center gap-3">
                   {messages.length > 0 && (
                     <button
                       onClick={handleResetHistory}
-                      className="text-[10px] text-rose-400 hover:text-rose-350 bg-rose-500/10 border border-rose-500/20 px-2 py-1 rounded transition font-mono uppercase font-bold"
+                      className="text-[9px] text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-1 transition font-mono uppercase font-bold hover:bg-rose-500/20"
                     >
                       Reset History
                     </button>
@@ -614,34 +618,34 @@ export default function SandboxPage() {
                 
                 {/* Greeting / Default */}
                 <div className="flex items-start gap-2.5 max-w-[85%]">
-                  <div className="w-8 h-8 rounded-full bg-slate-950 flex items-center justify-center text-indigo-400 border border-slate-800">
+                  <div className="w-8 h-8 flex items-center justify-center text-cyan-400 border border-[#2F323B] bg-[#050505]">
                     <Bot className="w-4 h-4" />
                   </div>
-                  <div className="bg-slate-950/60 border border-slate-800 rounded-2xl rounded-tl-none p-3.5 text-slate-300 text-sm">
-                    <p className="font-bold text-indigo-300 text-xs mb-1">{activeNpc?.name || "System"}</p>
+                  <div className="bg-[#050505] border border-[#2F323B] p-3.5 text-slate-300 text-sm">
+                    <p className="font-bold text-cyan-400 text-[10px] mb-1 font-mono uppercase">{activeNpc?.name || "System"}</p>
                     Greetings, Developer. I'm ready. Type something in the prompt bar to trigger my dynamic dialogue generation flow.
                   </div>
                 </div>
 
                 {messages.map((msg, index) => (
                   <div key={index} className={`flex items-start gap-2.5 max-w-[85%] ${msg.role === "user" ? "ml-auto flex-row-reverse" : ""}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border text-xs ${
+                    <div className={`w-8 h-8 flex items-center justify-center border text-[10px] font-mono font-bold ${
                       msg.role === "user" 
-                        ? "bg-indigo-600/10 text-indigo-400 border-indigo-500/20" 
-                        : "bg-slate-950 text-indigo-400 border-slate-800"
+                        ? "bg-cyan-400/10 text-cyan-400 border-cyan-500/20" 
+                        : "bg-[#050505] text-cyan-400 border-[#2F323B]"
                     }`}>
                       {msg.role === "user" ? "P" : <Bot className="w-4 h-4" />}
                     </div>
 
                     {msg.isPendingPayment ? (
                       /* x402 Cryptographic Challenge Alert inside Chat */
-                      <div className="bg-amber-600/10 border border-amber-500/30 rounded-2xl rounded-tl-none p-4 text-xs font-mono space-y-3 w-full shadow-[0_0_15px_rgba(245,158,11,0.05)]">
+                      <div className="bg-amber-500/5 border border-amber-500/30 p-4 text-xs font-mono space-y-3 w-full">
                         <div className="flex justify-between items-center text-amber-400 font-bold border-b border-amber-500/20 pb-1.5">
-                          <span className="flex items-center gap-1">
-                            <Coins className="w-4 h-4 text-amber-400" />
+                          <span className="flex items-center gap-1 uppercase tracking-wider text-[10px]">
+                            <Coins className="w-4 h-4" />
                             x402 Micropayment Required
                           </span>
-                          <span className="text-[10px] bg-amber-500/10 border border-amber-500/25 px-1.5 py-0.5 rounded">HTTP 402</span>
+                          <span className="text-[9px] bg-amber-500/10 border border-amber-500/25 px-1.5 py-0.5 uppercase">HTTP 402</span>
                         </div>
 
                         <div className="space-y-1 text-slate-300">
@@ -652,7 +656,7 @@ export default function SandboxPage() {
 
                         <button
                           onClick={() => handleSignAndSettle(index, msg.challenge)}
-                          className="w-full flex items-center justify-center gap-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold py-2 rounded-xl text-xs transition uppercase tracking-wider"
+                          className="w-full flex items-center justify-center gap-1.5 bg-amber-500 hover:bg-white text-black font-bold py-2 text-xs transition uppercase tracking-wider font-mono"
                         >
                           <Wallet className="w-3.5 h-3.5" />
                           Sign EIP-191 & Settle
@@ -662,14 +666,14 @@ export default function SandboxPage() {
                       /* Plain text dialogue bubbles */
                       <div className={`p-3.5 text-sm ${
                         msg.role === "user" 
-                          ? "bg-indigo-600/15 border border-indigo-500/25 text-indigo-100 rounded-2xl rounded-tr-none" 
-                          : "bg-slate-950/60 border border-slate-800 text-slate-300 rounded-2xl rounded-tl-none"
+                          ? "bg-cyan-400/10 border border-cyan-500/20 text-white" 
+                          : "bg-[#050505] border border-[#2F323B] text-slate-300"
                       }`}>
-                        <p className="font-bold text-xs mb-1 text-slate-400">
+                        <p className="font-bold text-[9px] mb-1 text-slate-400 font-mono uppercase tracking-wider">
                           {msg.role === "user" ? "Player" : activeNpc?.name}
                           {msg.emotion && (
-                            <span className="ml-2 font-normal text-[10px] font-mono bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-1.5 py-0.2 rounded">
-                              Emotion: {msg.emotion}
+                            <span className="ml-2 font-normal font-mono bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-1.5 py-0.5">
+                              {msg.emotion}
                             </span>
                           )}
                         </p>
@@ -682,28 +686,28 @@ export default function SandboxPage() {
                 {/* Loading state indicator */}
                 {loading && pipelineStep !== "challenged" && (
                   <div className="flex items-center gap-2 text-xs text-slate-500 font-mono pl-11">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-ping"></span>
-                    Pipeline executing: <span className="text-indigo-400 font-bold capitalize">{pipelineStep}...</span>
+                    <span className="w-1.5 h-1.5 bg-cyan-400 animate-ping"></span>
+                    Pipeline executing: <span className="text-cyan-400 font-bold uppercase">{pipelineStep}...</span>
                   </div>
                 )}
 
                 {/* Multiple alternative generated choices */}
                 {dialogueChoices.length > 0 && (
-                  <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 space-y-3 font-sans animate-fadeIn">
-                    <p className="text-xs font-bold text-slate-400 border-b border-slate-800 pb-2 flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-                      Inference Options Returned (Select one response to continue narrative):
+                  <div className="bg-[#050505] border border-[#2F323B] p-4 space-y-3 font-sans">
+                    <p className="text-[9px] font-bold text-slate-400 border-b border-[#2F323B] pb-2 flex items-center gap-1 font-mono uppercase tracking-widest">
+                      <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                      Inference Options — Select one to continue narrative:
                     </p>
                     <div className="space-y-2">
                       {dialogueChoices.map((choice, i) => (
                         <button
                           key={i}
                           onClick={() => handleSelectChoice(choice)}
-                          className="w-full text-left p-3 bg-slate-900 border border-slate-800/60 rounded-xl hover:border-indigo-500/60 hover:bg-indigo-600/5 transition group text-sm"
+                          className="w-full text-left p-3 bg-[#0c0c0c] border border-[#2F323B] hover:border-cyan-400/40 hover:bg-cyan-400/5 transition group text-sm"
                         >
-                          <div className="flex justify-between items-center text-xs mb-1 font-mono">
-                            <span className="text-indigo-400 font-bold font-mono">Option {i + 1}</span>
-                            <span className="text-slate-500">Emotion: <strong className="text-indigo-300 font-normal">{choice.emotion}</strong></span>
+                          <div className="flex justify-between items-center text-[9px] mb-1 font-mono uppercase tracking-wider">
+                            <span className="text-cyan-400 font-bold">Option {i + 1}</span>
+                            <span className="text-slate-500">Emotion: <strong className="text-cyan-300 font-normal">{choice.emotion}</strong></span>
                           </div>
                           <p className="text-slate-200 group-hover:text-white leading-relaxed">{choice.text}</p>
                         </button>
@@ -716,19 +720,19 @@ export default function SandboxPage() {
               </div>
 
               {/* Chat Input panel */}
-              <form onSubmit={handleSendMessage} className="p-4 border-t border-slate-800 bg-slate-950/20 flex gap-2">
+              <form onSubmit={handleSendMessage} className="p-4 border-t border-[#2F323B] bg-[#050505] flex gap-2">
                 <input
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   disabled={loading || dialogueChoices.length > 0}
-                  className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition disabled:opacity-50"
+                  className="flex-1 bg-[#0c0c0c] border border-[#2F323B] px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-400 transition disabled:opacity-50"
                   placeholder={dialogueChoices.length > 0 ? "Select one of the choices above to proceed..." : "Say something to the NPC..."}
                 />
                 <button
                   type="submit"
                   disabled={loading || !inputValue.trim() || dialogueChoices.length > 0}
-                  className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 text-white p-2.5 rounded-xl transition flex items-center justify-center flex-shrink-0 shadow-[0_0_10px_rgba(79,70,229,0.3)]"
+                  className="bg-cyan-400 hover:bg-white disabled:bg-cyan-400/30 disabled:cursor-not-allowed text-black font-bold p-2.5 transition flex items-center justify-center flex-shrink-0"
                 >
                   <Send className="w-4 h-4" />
                 </button>
@@ -736,16 +740,16 @@ export default function SandboxPage() {
             </div>
 
             {/* Developer Raw JSON Console Inspector */}
-            <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden flex flex-col h-[350px]">
+            <div className="bg-[#0c0c0c] border border-[#2F323B] overflow-hidden flex flex-col h-[350px]">
               
               {/* Tab Header */}
-              <div className="bg-slate-950/40 border-b border-slate-800 flex justify-between items-center px-4 flex-wrap">
+              <div className="bg-[#050505] border-b border-[#2F323B] flex justify-between items-center px-4 flex-wrap">
                 <div className="flex gap-1 overflow-x-auto py-2">
                   <button
                     onClick={() => setActiveLogTab("requestInit")}
-                    className={`px-3 py-1.5 rounded-lg text-[10px] font-mono font-bold uppercase transition ${
+                    className={`px-3 py-1.5 text-[9px] font-mono font-bold uppercase tracking-wider transition ${
                       activeLogTab === "requestInit" 
-                        ? "bg-slate-800 text-indigo-400 border border-slate-700/50" 
+                        ? "bg-[#0c0c0c] text-cyan-400 border-b-2 border-cyan-400" 
                         : "text-slate-500 hover:text-slate-300"
                     }`}
                   >
@@ -753,9 +757,9 @@ export default function SandboxPage() {
                   </button>
                   <button
                     onClick={() => setActiveLogTab("challengeResponse")}
-                    className={`px-3 py-1.5 rounded-lg text-[10px] font-mono font-bold uppercase transition ${
+                    className={`px-3 py-1.5 text-[9px] font-mono font-bold uppercase tracking-wider transition ${
                       activeLogTab === "challengeResponse" 
-                        ? "bg-slate-800 text-indigo-400 border border-slate-700/50" 
+                        ? "bg-[#0c0c0c] text-cyan-400 border-b-2 border-cyan-400" 
                         : "text-slate-500 hover:text-slate-300"
                     }`}
                   >
@@ -763,9 +767,9 @@ export default function SandboxPage() {
                   </button>
                   <button
                     onClick={() => setActiveLogTab("settlementRequest")}
-                    className={`px-3 py-1.5 rounded-lg text-[10px] font-mono font-bold uppercase transition ${
+                    className={`px-3 py-1.5 text-[9px] font-mono font-bold uppercase tracking-wider transition ${
                       activeLogTab === "settlementRequest" 
-                        ? "bg-slate-800 text-indigo-400 border border-slate-700/50" 
+                        ? "bg-[#0c0c0c] text-cyan-400 border-b-2 border-cyan-400" 
                         : "text-slate-500 hover:text-slate-300"
                     }`}
                   >
@@ -773,9 +777,9 @@ export default function SandboxPage() {
                   </button>
                   <button
                     onClick={() => setActiveLogTab("settlementResponse")}
-                    className={`px-3 py-1.5 rounded-lg text-[10px] font-mono font-bold uppercase transition ${
+                    className={`px-3 py-1.5 text-[9px] font-mono font-bold uppercase tracking-wider transition ${
                       activeLogTab === "settlementResponse" 
-                        ? "bg-slate-800 text-indigo-400 border border-slate-700/50" 
+                        ? "bg-[#0c0c0c] text-cyan-400 border-b-2 border-cyan-400" 
                         : "text-slate-500 hover:text-slate-300"
                     }`}
                   >
@@ -786,22 +790,22 @@ export default function SandboxPage() {
                 {logs[activeLogTab] && (
                   <button
                     onClick={() => handleCopyLogs(JSON.stringify(logs[activeLogTab], null, 2))}
-                    className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-slate-200 bg-slate-950 px-2 py-1 rounded border border-slate-800 transition"
+                    className="flex items-center gap-1.5 text-[9px] text-slate-400 hover:text-white bg-[#0c0c0c] px-2 py-1 border border-[#2F323B] transition font-mono uppercase tracking-wider"
                   >
-                    {copiedText ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    {copiedText ? <Check className="w-3 h-3 text-lime-400" /> : <Copy className="w-3 h-3" />}
                     Copy JSON
                   </button>
                 )}
               </div>
 
               {/* Console Body */}
-              <div className="flex-1 p-4 bg-slate-950/80 overflow-y-auto font-mono text-xs text-indigo-300">
+              <div className="flex-1 p-4 bg-[#050505] overflow-y-auto font-mono text-xs text-cyan-300">
                 {logs[activeLogTab] ? (
                   <pre className="whitespace-pre-wrap">{JSON.stringify(logs[activeLogTab], null, 2)}</pre>
                 ) : (
-                  <div className="h-full flex flex-col items-center justify-center text-slate-600 text-xs">
+                  <div className="h-full flex flex-col items-center justify-center text-slate-700 text-xs font-mono">
                     <Terminal className="w-8 h-8 mb-2" />
-                    <span>No payload registered for this step yet.</span>
+                    <span className="uppercase tracking-wider">No payload registered for this step yet.</span>
                   </div>
                 )}
               </div>

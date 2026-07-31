@@ -51,13 +51,13 @@ export async function POST(req: NextRequest) {
     });
 
     if (user.projects.length > 0) {
-      cookieStore.set("projectId", user.projects[0].id, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-      });
-    }
+       cookieStore.set("projectId", user.projects[0].id, {
+         httpOnly: false,
+         secure: process.env.NODE_ENV === "production",
+         path: "/",
+         maxAge: 60 * 60 * 24 * 7,
+       });
+     }
 
     return NextResponse.json({
       status: "success",

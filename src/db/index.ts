@@ -10,16 +10,22 @@ export let isRealDb = false;
 export let db: any;
 
 if (databaseUrl && (databaseUrl.startsWith("postgres://") || databaseUrl.startsWith("postgresql://"))) {
+  const pool = new Pool({
+    connectionString: databaseUrl,
+    ssl: databaseUrl.includes("localhost") || databaseUrl.includes("127.0.0.1") ? false : { rejectUnauthorized: false },
+    connectionTimeoutMillis: 1500, // Fail fast if unreachable
+  });
+
   try {
-    const pool = new Pool({
-      connectionString: databaseUrl,
-      ssl: databaseUrl.includes("localhost") || databaseUrl.includes("127.0.0.1") ? false : { rejectUnauthorized: false }
-    });
+    // Probe the connection
+    const client = await pool.connect();
+    client.release();
     db = drizzle(pool, { schema });
     isRealDb = true;
     console.log("Database initialized using real PostgreSQL connection.");
   } catch (err) {
-    console.error("Failed to initialize real PostgreSQL, falling back to mock DB:", err);
+    console.warn("Failed to connect to real PostgreSQL, falling back to mock DB:", err);
+    await pool.end().catch(() => {});
     db = mockDb;
     isRealDb = false;
   }

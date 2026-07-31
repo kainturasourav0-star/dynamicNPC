@@ -120,14 +120,32 @@ class InsertQuery {
   }
 
   returning() {
+    const defaults: Record<string, any> = {};
+    if (this.tableName === 'npc_profiles') {
+      defaults.isDeleted = false;
+      defaults.tone = "Neutral";
+      defaults.style = "";
+      defaults.safetyRules = "";
+      defaults.cost = "0.0100";
+    } else if (this.tableName === 'api_keys') {
+      defaults.isActive = true;
+    } else if (this.tableName === 'dialogue_requests') {
+      defaults.cost = "0.0100";
+    }
+
     const record = {
       id: this.data.id || generateUuid(),
       createdAt: new Date(),
       updatedAt: new Date(),
+      ...defaults,
       ...this.data
     };
     storage[this.tableName].push(record);
     return Promise.resolve([record]);
+  }
+
+  then(onfulfilled?: (value: any) => any, onrejected?: (reason: any) => any) {
+    return this.returning().then(onfulfilled, onrejected);
   }
 }
 

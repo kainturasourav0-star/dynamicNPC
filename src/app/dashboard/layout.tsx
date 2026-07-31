@@ -11,7 +11,9 @@ import {
   LogOut, 
   LayoutDashboard, 
   FolderGit2,
-  ChevronDown
+  ChevronDown,
+  Play,
+  Gamepad2
 } from "lucide-react";
 
 interface Project {
@@ -109,6 +111,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const menuItems = [
     { name: "Overview", path: "/dashboard", icon: LayoutDashboard },
     { name: "NPC Profiles", path: "/dashboard/npcs", icon: Bot },
+    { name: "Dialogue Sandbox", path: "/dashboard/sandbox", icon: Play },
+    { name: "Interactive Demo Game", path: "/dashboard/game", icon: Gamepad2 },
     { name: "API Keys", path: "/dashboard/keys", icon: Key },
     { name: "Dialogue Logs", path: "/dashboard/logs", icon: Terminal },
     { name: "Integrations & Docs", path: "/dashboard/docs", icon: BookOpen },

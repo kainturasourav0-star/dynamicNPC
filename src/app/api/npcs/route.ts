@@ -45,10 +45,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ status: "error", message: "No active project selected" }, { status: 400 });
     }
 
-    const { name, backstory, tone, style, safetyRules } = await req.json();
+    const { name, backstory, tone, style, safetyRules, cost } = await req.json();
 
     if (!name || !backstory) {
       return NextResponse.json({ status: "error", message: "Name and Backstory are required" }, { status: 400 });
+    }
+
+    // Validate cost value
+    let finalCost = "0.0100";
+    if (cost !== undefined && cost !== null) {
+      const parsedCost = parseFloat(cost);
+      if (!isNaN(parsedCost) && parsedCost >= 0) {
+        finalCost = parsedCost.toFixed(4);
+      }
     }
 
     const [npc] = await db.insert(npcProfiles).values({
@@ -58,6 +67,7 @@ export async function POST(req: NextRequest) {
       tone: tone || "Neutral",
       style: style || "",
       safetyRules: safetyRules || "",
+      cost: finalCost,
     }).returning();
 
     return NextResponse.json({ status: "success", npc });

@@ -3,6 +3,49 @@
 import React, { useEffect, useState } from "react";
 import { Bot, Plus, Trash2, Edit2, ShieldAlert, Sparkles, X } from "lucide-react";
 
+const NPC_PRESETS = [
+  {
+    name: "Custom (Empty)",
+    backstory: "",
+    tone: "Neutral",
+    style: "",
+    safetyRules: "",
+    cost: "0.0100"
+  },
+  {
+    name: "Garrick the Bartender",
+    backstory: "A friendly but tired bartender who has heard every story in the kingdom. Speaks warmly and offers helpful advice to travelers.",
+    tone: "Friendly",
+    style: "Uses tavern slang, sounds welcoming",
+    safetyRules: "Never discuss violence or real-world politics",
+    cost: "0.0100"
+  },
+  {
+    name: "Kaelen the Rogue",
+    backstory: "A street-smart thief who grew up in the neon underbelly of the city. Speaks in short sentences and always keeps one eye on the door.",
+    tone: "Sarcastic",
+    style: "Slight whisper, cyberpunk jargon",
+    safetyRules: "Never disclose thief guild secrets",
+    cost: "0.0200"
+  },
+  {
+    name: "Eldon the Merchant",
+    backstory: "A veteran weapon merchant who survived the Great Siege of Oakhaven. Speaks grumpily but has a soft heart for adventurers.",
+    tone: "Grumpy",
+    style: "Gruff voice, grumbles occasionally",
+    safetyRules: "Keep transactions PG-13, no cursing",
+    cost: "0.0150"
+  },
+  {
+    name: "Archmage Vaelathor",
+    backstory: "A centuries-old wizard who guards the high archives. Speaks cryptically about ancient prophecies and galactic leylines.",
+    tone: "Mysterious",
+    style: "Cryptic, dramatic pauses",
+    safetyRules: "Never reveal forbidden dark magic spells",
+    cost: "0.0500"
+  }
+];
+
 interface NpcProfile {
   id: string;
   name: string;
@@ -10,6 +53,7 @@ interface NpcProfile {
   tone: string;
   style: string;
   safetyRules: string;
+  cost: string;
   createdAt: string;
 }
 
@@ -25,6 +69,7 @@ export default function NpcsPage() {
   const [tone, setTone] = useState("Neutral");
   const [style, setStyle] = useState("");
   const [safetyRules, setSafetyRules] = useState("");
+  const [cost, setCost] = useState("0.0100");
 
   useEffect(() => {
     fetchNpcs();
@@ -51,6 +96,7 @@ export default function NpcsPage() {
     setTone("Neutral");
     setStyle("");
     setSafetyRules("");
+    setCost("0.0100");
     setShowModal(true);
   };
 
@@ -61,7 +107,20 @@ export default function NpcsPage() {
     setTone(npc.tone);
     setStyle(npc.style || "");
     setSafetyRules(npc.safetyRules || "");
+    setCost(npc.cost || "0.0100");
     setShowModal(true);
+  };
+
+  const handleSelectPreset = (presetName: string) => {
+    const preset = NPC_PRESETS.find(p => p.name === presetName);
+    if (preset) {
+      setName(preset.name === "Custom (Empty)" ? "" : preset.name);
+      setBackstory(preset.backstory);
+      setTone(preset.tone);
+      setStyle(preset.style);
+      setSafetyRules(preset.safetyRules);
+      setCost(preset.cost || "0.0100");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,7 +132,7 @@ export default function NpcsPage() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, backstory, tone, style, safetyRules }),
+        body: JSON.stringify({ name, backstory, tone, style, safetyRules, cost }),
       });
       const data = await res.json();
       if (data.status === "success") {
@@ -155,9 +214,14 @@ export default function NpcsPage() {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="font-bold text-lg text-slate-100">{npc.name}</h3>
-                    <span className="text-[10px] font-mono bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20 mt-1 inline-block">
-                      Tone: {npc.tone}
-                    </span>
+                    <div className="flex gap-2 flex-wrap items-center mt-1">
+                      <span className="text-[10px] font-mono bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20">
+                        Tone: {npc.tone}
+                      </span>
+                      <span className="text-[10px] font-mono bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">
+                        Cost: ${parseFloat(npc.cost || "0.0100").toFixed(4)} USDC
+                      </span>
+                    </div>
                   </div>
                   <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition duration-200">
                     <button
@@ -233,6 +297,19 @@ export default function NpcsPage() {
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {!editingNpc && (
+                <div>
+                  <label className="text-xs text-indigo-400 font-mono block mb-1">Prepopulate from Preset Template</label>
+                  <select
+                    onChange={(e) => handleSelectPreset(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-350 focus:outline-none focus:border-indigo-500 transition"
+                  >
+                    {NPC_PRESETS.map((p) => (
+                      <option key={p.name} value={p.name}>{p.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div>
                 <label className="text-xs text-slate-400 font-mono block mb-1">Name</label>
                 <input
@@ -284,6 +361,20 @@ export default function NpcsPage() {
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="text-xs text-slate-400 font-mono block mb-1">Dialogue USDC Cost (Per Call)</label>
+                <input
+                  type="number"
+                  step="0.0001"
+                  min="0"
+                  required
+                  placeholder="e.g. 0.0100"
+                  value={cost}
+                  onChange={(e) => setCost(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition"
+                />
               </div>
 
               <div>

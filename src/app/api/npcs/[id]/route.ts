@@ -24,7 +24,7 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    const { name, backstory, tone, style, safetyRules } = body;
+    const { name, backstory, tone, style, safetyRules, cost } = body;
 
     // Verify NPC profile belongs to this project
     const npc = await db.query.npcProfiles.findFirst({
@@ -35,6 +35,15 @@ export async function PATCH(
       return NextResponse.json({ status: "error", message: "NPC not found" }, { status: 404 });
     }
 
+    // Validate cost value if provided
+    let finalCost = npc.cost;
+    if (cost !== undefined && cost !== null) {
+      const parsedCost = parseFloat(cost);
+      if (!isNaN(parsedCost) && parsedCost >= 0) {
+        finalCost = parsedCost.toFixed(4);
+      }
+    }
+
     const [updatedNpc] = await db.update(npcProfiles)
       .set({
         name: name !== undefined ? name : npc.name,
@@ -42,6 +51,7 @@ export async function PATCH(
         tone: tone !== undefined ? tone : npc.tone,
         style: style !== undefined ? style : npc.style,
         safetyRules: safetyRules !== undefined ? safetyRules : npc.safetyRules,
+        cost: finalCost,
         updatedAt: new Date(),
       })
       .where(eq(npcProfiles.id, id))

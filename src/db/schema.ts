@@ -34,6 +34,7 @@ export const npcProfiles = pgTable("npc_profiles", {
   tone: varchar("tone", { length: 255 }).default("Neutral").notNull(),
   style: text("style"),
   safetyRules: text("safety_rules"),
+  cost: decimal("cost", { precision: 10, scale: 4 }).default("0.0100").notNull(),
   isDeleted: boolean("is_deleted").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

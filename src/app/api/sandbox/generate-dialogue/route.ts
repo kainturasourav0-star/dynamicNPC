@@ -1,41 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { apiKeys, npcProfiles, dialogueRequests, paymentReceipts, conversationHistory } from "@/db/schema";
+import { npcProfiles, dialogueRequests, paymentReceipts, conversationHistory } from "@/db/schema";
 import { eq, and } from "@/db";
-import crypto from "crypto";
 import { createX402Challenge, verifySignatureAndSettle, X402Challenge } from "@/lib/x402";
 import { generateDialogue } from "@/lib/llm";
-
-// Helper to hash incoming API key
-function hashApiKey(key: string): string {
-  return crypto.createHash("sha256").update(key).digest("hex");
-}
+import { cookies } from "next/headers";
+import { getSessionUser } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    // 1. Authenticate with session cookie
+    const user = await getSessionUser();
+    if (!user) {
       return NextResponse.json(
-        { status: "error", errorCode: "UNAUTHORIZED", message: "Missing or invalid API key" },
+        { status: "error", errorCode: "UNAUTHORIZED", message: "Unauthorized: Please log in" },
         { status: 401 }
       );
     }
 
-    const apiKeyRaw = authHeader.substring(7);
-    const keyHash = hashApiKey(apiKeyRaw);
+    const cookieStore = await cookies();
+    const projectId = cookieStore.get("projectId")?.value;
 
-    // 1. Resolve project from API key
-    const activeKey = await db.query.apiKeys.findFirst({
-      where: and(eq(apiKeys.keyHash, keyHash), eq(apiKeys.isActive, true)),
-      with: {
-        project: true,
-      },
-    });
-
-    if (!activeKey) {
+    if (!projectId) {
       return NextResponse.json(
-        { status: "error", errorCode: "UNAUTHORIZED", message: "API key is invalid or inactive" },
-        { status: 401 }
+        { status: "error", errorCode: "BAD_REQUEST", message: "No active project selected" },
+        { status: 400 }
       );
     }
 
@@ -44,9 +33,9 @@ export async function POST(req: NextRequest) {
 
     // --- PHASE 2: Settle Phase (Retry / Payment Verification) ---
     if (requestId && signature) {
-      // Find existing dialogue request
+      // Find existing dialogue request - ensure it belongs to this active project
       const dialogueReq = await db.query.dialogueRequests.findFirst({
-        where: eq(dialogueRequests.id, requestId),
+        where: and(eq(dialogueRequests.id, requestId), eq(dialogueRequests.projectId, projectId)),
         with: {
           npcProfile: true,
         },
@@ -92,7 +81,7 @@ export async function POST(req: NextRequest) {
           },
         }).returning();
 
-        // Call Gemini to generate dynamic NPC dialogue
+        // Call Gemini/NVIDIA to generate dynamic NPC dialogue
         const npc = dialogueReq.npcProfile;
         const playerAddress = settlement.payerAddress;
 
@@ -188,7 +177,7 @@ export async function POST(req: NextRequest) {
 
     // Verify NPC profile belongs to this project
     const npc = await db.query.npcProfiles.findFirst({
-      where: and(eq(npcProfiles.id, npcId), eq(npcProfiles.projectId, activeKey.projectId), eq(npcProfiles.isDeleted, false)),
+      where: and(eq(npcProfiles.id, npcId), eq(npcProfiles.projectId, projectId), eq(npcProfiles.isDeleted, false)),
     });
 
     if (!npc) {
@@ -201,7 +190,7 @@ export async function POST(req: NextRequest) {
     // Create a new dialogue request entry using NPC's configured cost option
     const cost = npc.cost || "0.0100";
     const [newRequest] = await db.insert(dialogueRequests).values({
-      projectId: activeKey.projectId,
+      projectId,
       npcId: npc.id,
       status: "CHALLENGE_ISSUED",
       cost,
@@ -210,6 +199,9 @@ export async function POST(req: NextRequest) {
 
     // Generate x402 challenge
     const challenge = createX402Challenge(newRequest.id, cost);
+    if (body.chainId) {
+      challenge.chainId = Number(body.chainId);
+    }
 
     // Save challenge inside dialogue request payload
     await db.update(dialogueRequests)
@@ -229,7 +221,7 @@ export async function POST(req: NextRequest) {
     );
 
   } catch (error: any) {
-    console.error("Dialogue API handler error:", error);
+    console.error("Dialogue API sandbox handler error:", error);
     return NextResponse.json(
       { status: "error", errorCode: "INTERNAL_ERROR", message: "Internal server error" },
       { status: 500 }

@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     // Automatically set the newly created project as the active project in cookies
     const cookieStore = await cookies();
     cookieStore.set("projectId", newProj.id, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       path: "/",
       maxAge: 60 * 60 * 24 * 7,

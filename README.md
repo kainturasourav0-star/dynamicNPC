@@ -1,68 +1,55 @@
-# x402 Protocol - Dynamic NPC Dialogue Platform
+🎮 Dynamic NPC Dialogue — NPC-402
 
-This application is a Web3-integrated pay-per-call AI Dialogue generation platform. It implements the **x402 Micropayment Protocol** which permits game clients to pay dynamic USDC micropayments (settled via cryptographic signatures) per AI dialogue turn.
+A pay-per-call AI dialogue engine for games, built on the x402 micropayment protocol.
 
----
+🧠 Built For
 
-## 🛰️ What Does This App Do?
+Brainwave 2026 – X402 Blockchain Track — an international hackathon hosted on Devpost, organized by ACTS EDC, Delhi (July 3–31, 2026). The X402 Blockchain Track challenges builders to create real pay-per-call products using the complete x402 payment flow: Challenge → Sign → Retry → Settle.
 
-Traditional games use static dialogue trees or bear high cloud LLM hosting costs. This platform resolves both by:
-1. **Dynamic Dialogue Generation**: Routes player actions and backstory context through advanced LLM models (Gemini / Nvidia NeMo) to generate adaptive, stateful dialogue options in real-time.
-2. **Cryptographic Micro-Billing (x402)**: Returns an `HTTP 402 Payment Required` challenge when a dialogue request is initiated. The game client must sign this challenge using an EIP-191 personal signature and settle the challenge (a mock USDC transfer representation) to recover the LLM output.
-3. **Conversational Memory**: Stores dialogue Turn logs in the database to maintain context across multi-turn interactions.
+NPC-402 fits the Gaming + AI API category — every NPC conversation is a metered, blockchain-settled transaction.
 
----
+💡 What It Does
 
-## ⚡ How the Options and Customizations Work
+Traditional games use static, hand-written dialogue trees. NPC-402 replaces that with live AI-generated NPC responses. Every time a player talks to an NPC, the game calls an API, the AI generates a unique response in real time, and the developer pays $0.01 USDC for that single call — no subscriptions, no upfront costs.
 
-The platform provides several developer tools, playgrounds, and configurable options:
+⚡ How It Works
 
-### 1. Dynamic NPC Custom Pricing
-*   **What it is**: Developers can configure unique USDC fee rates per dialogue turn on an NPC-by-NPC basis (e.g. `$0.0100` USDC for standard villager dialogue, or `$0.0500` USDC for rare quest givers).
-*   **How it works**: Setting the price in the NPC Creator form stores the `cost` column in the database. When the game queries dialogue for that NPC, the x402 protocol returns a payment challenge matching the exact rate configured.
+Every NPC conversation runs through three automatic steps:
 
-### 2. NPC Presets (Templates)
-*   **What it is**: Auto-population options inside the Create NPC form.
-*   **How it works**: Select templates like *Garrick the Bartender* or *Archmage Vaelathor* to pre-fill character backstory, tone constraints, speaking style, safety guidelines, and default billing fees automatically.
+1. Challenge
+The game sends a request to /api/generate-dialogue. The server responds with HTTP 402 (Payment Required) containing a payment challenge — how much USDC is owed, to which wallet, on which chain.
 
-### 3. Dialogue Sandbox Configuration
-*   **What it is**: An interactive test-bench playground (`/dashboard/sandbox`) to run dialogues step-by-step and inspect JSON payloads.
-*   **Configurable Parameters**:
-    *   **Chain Selection Dropdown**: Test cryptographic signatures across different test networks (Base Sepolia, Optimism Sepolia, Arbitrum Sepolia).
-    *   **Stateful Prompt / Context**: Modify the narrative scenario dynamically.
-    *   **Player Attributes**: Add mock player levels or items in JSON format (e.g. `{"level": 3, "gold": 120}`).
-    *   **Reset History button**: Clears active dialogue history log records matching the selected NPC and player wallet to start Turn 1 anew.
-    *   **Wallet toggle**: Swap between an on-page simulated signing wallet or connecting a live Web3 browser-extension wallet (e.g. MetaMask).
+2. Sign
+The game client signs the challenge using the EIP-191 standard. This cryptographically authorizes the $0.01 charge without any actual transfer yet.
 
-### 4. Interactive 2D RPG Simulator
-*   **What it is**: A playable 2D game canvas inside the dashboard (`/dashboard/game`).
-*   **How it works**: Walk a character using **WASD / Arrow keys** adjacent to custom NPCs and press **[SPACE]** to trigger the live x402 payment challenge and LLM settlement sequence.
-*   *Note: A standalone copy is available at [testgame.html](testgame.html) which can be double-clicked and run directly in any browser.*
+3. Settle & Generate
+The signed request is sent back. The server verifies the signature, settles the USDC payment on-chain, calls the AI model (Google Gemini / Nvidia NIM), and returns the NPC's dialogue plus a transaction receipt.
 
----
+⏱ Full round-trip: ~0.2 seconds
 
-## 🚀 How to Run Locally
+🖥️ Dashboard Features
+Section	What It Does
+NPC Profiles	Create NPCs with custom backstory, personality, tone, and per-NPC USDC pricing
+Dialogue Sandbox	Test live dialogue calls with simulated or real wallet, inspect raw JSON payloads
+Interactive Demo Game	Playable 2D RPG in the browser — walk up to NPCs and trigger real AI conversations
+API Keys	Generate and manage authentication keys for your game client
+Dialogue Logs	Full history of every call — responses, timestamps, payment receipts
+Integrations & Docs	Code snippets for cURL, Node.js/TypeScript, and Unity C#
+🔗 Live Demo
 
-### 1. Install Dependencies
-```bash
+👉 dynamic-npc-dialogue.vercel.app
+
+🛠️ Tech Stack
+Next.js — Server and dashboard UI
+x402 Protocol — HTTP-native micropayment standard
+Google Gemini / Nvidia NIM — AI dialogue generation
+EIP-191 / EIP-712 — Cryptographic payment authorization
+Base Sepolia (Testnet) — USDC settlement chain
+Drizzle ORM — Database layer
+🚀 Run Locally
+bash
 npm install
-```
-
-### 2. Configure Environment Variables
-Copy `.env.example` to `.env` and configure:
-```env
-# Optional Gemini/Nvidia API Keys
-GEMINI_API_KEY=your_key_here
-```
-
-### 3. Start Development Server
-```bash
+# copy .env.example to .env and add your API keys
 npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000) in your browser to view the console.
 
-### 4. Execute Tests
-To run the automated sandbox integration tests:
-```bash
-npx tsx scratch/test-sandbox-api.ts
-```
+Open http://localhost:3000

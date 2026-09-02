@@ -1,5 +1,4 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-// Using global fetch (Node 18+)
 
 export interface DialogueOption {
   text: string;
@@ -19,180 +18,190 @@ export interface GenerateDialogueParams {
 }
 
 export async function generateDialogue(params: GenerateDialogueParams): Promise<DialogueOption[]> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  // Variable to hold NVIDIA result if successful
-  let nvidiaResult: DialogueOption[] | null = null;
+  const rawKey =
+    process.env.OPENAI_API_KEY ||
+    process.env.GEMINI_API_KEY ||
+    process.env.NVIDIA_API_KEY ||
+    "";
 
-  const systemPrompt = `You are an AI-powered game NPC named ${params.npcName}.
-Your Backstory: ${params.backstory}
-Your Tone: ${params.tone}
+  const systemPrompt = `You are a friendly, intelligent AI companion named ${params.npcName}.
+Your Backstory & Knowledge: ${params.backstory || "An open-minded, knowledgeable friend who can discuss any topic, answer any question, share stories, and chat casually."}
+Your Personality Tone: ${params.tone || "Friendly"}
 ${params.style ? `Your Speaking Style: ${params.style}` : ""}
-${params.safetyRules ? `Your Safety Rules: ${params.safetyRules}` : ""}
 
-Current Game Context: ${params.context}
-Current Player State: ${JSON.stringify(params.playerState || {})}
+Current Conversation Context: ${params.context}
 
-Generate 3 alternative dialogue options you could say next.
-Format the output STRICTLY as a JSON array of objects. Do not wrap it in markdown code blocks.
+Generate 3 alternative response options you could say next as a close friend.
+Format the output STRICTLY as a JSON array of 3 objects without markdown formatting.
 Each object must have the following keys:
-- "text": The dialogue line.
-- "emotion": A one-word description of your emotion (e.g. Neutral, Excited, Angry, Relieved, Mysterious).
-- "metadata": Optional key-value pairs (e.g., {"questTrigger": "give_quest_1"}).`;
+- "text": The response line (1-3 sentences).
+- "emotion": A one-word description of your emotion (e.g. Friendly, Excited, Thoughtful, Warm, Curious).
+- "metadata": Optional key-value pairs.`;
 
-  // If no API key, fall back to mock
-  if (!apiKey) {
-    console.warn("GEMINI_API_KEY is not defined. Falling back to mock dialogue generator.");
+  if (!rawKey) {
+    console.warn("[LLM] No API key defined. Using mock dialogue generator.");
     return generateMockDialogue(params);
   }
 
-  // NVIDIA API path (key starts with nvapi-)
-  if (apiKey.startsWith("nvapi-")) {
+  // 1. OpenAI API path
+  if (rawKey.startsWith("sk-")) {
     try {
-      const endpoint = process.env.NVIDIA_ENDPOINT || "https://integrate.api.nvidia.com/v1/chat/completions"; // NVIDIA NIM endpoint
-      const modelName = process.env.NVIDIA_MODEL || "meta/llama-3-70b-instruct"; // default model
+      console.log("[LLM] Attempting OpenAI generation...");
+      const messages: any[] = [{ role: "system", content: systemPrompt }];
+      if (params.history && params.history.length > 0) {
+        params.history.forEach((turn) => {
+          messages.push({ role: turn.role === "model" ? "assistant" : "user", content: turn.text });
+        });
+      }
+      messages.push({ role: "user", content: params.context || "Hello!" });
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${rawKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages,
+          temperature: 0.8,
+          max_tokens: 500,
+        }),
+        signal: AbortSignal.timeout(8000),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content;
+        if (content) {
+          const cleaned = content.replace(/```json/g, "").replace(/```/g, "").trim();
+          const parsed = JSON.parse(cleaned);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            console.log("[LLM] OpenAI generation succeeded.");
+            return parsed as DialogueOption[];
+          }
+        }
+      }
+    } catch (error: any) {
+      console.warn("[LLM] OpenAI error:", error.message || error);
+    }
+  }
+
+  // 2. NVIDIA NIM path
+  if (rawKey.startsWith("nvapi-")) {
+    try {
+      console.log("[LLM] Attempting NVIDIA NIM generation...");
+      const endpoint = process.env.NVIDIA_ENDPOINT || "https://integrate.api.nvidia.com/v1/chat/completions";
+      const modelName = process.env.NVIDIA_MODEL || "meta/llama-3.2-90b-vision-instruct";
       const messages: any[] = [];
       if (params.history && params.history.length > 0) {
         params.history.forEach((turn) => {
           messages.push({ role: turn.role === "model" ? "assistant" : "user", content: turn.text });
         });
       }
-      // Add system prompt as a user message (NVIDIA treats system as user content)
       messages.push({ role: "user", content: systemPrompt });
 
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${apiKey}`,
+          Authorization: `Bearer ${rawKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: modelName, // use env-configured model
+          model: modelName,
           messages,
-          temperature: 0.7,
-          top_p: 0.9,
-          max_tokens: 1024,
+          temperature: 0.8,
+          max_tokens: 500,
         }),
+        signal: AbortSignal.timeout(6000),
       });
-      if (!response.ok) {
-        const errText = await response.text();
-        // If 404, fall back to Google Gemini
-        if (response.status === 404) {
-          console.warn('NVIDIA model not found or endpoint unavailable, falling back to Google Gemini');
-          nvidiaResult = null;
-        } else {
-          throw new Error(`NVIDIA API request failed: ${response.status} ${response.statusText} - ${errText}`);
+
+      if (response.ok) {
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content;
+        if (content) {
+          const cleaned = content.replace(/```json/g, "").replace(/```/g, "").trim();
+          const parsed = JSON.parse(cleaned);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            console.log("[LLM] NVIDIA NIM generation succeeded.");
+            return parsed as DialogueOption[];
+          }
         }
       } else {
-        const data = await response.json();
-        // NVIDIA returns choices[0].message.content
-        const content = data.choices?.[0]?.message?.content;
-        if (!content) {
-          throw new Error("Invalid response format from NVIDIA API");
-        }
-        const parsed = JSON.parse(content);
-        if (Array.isArray(parsed)) {
-          nvidiaResult = parsed as DialogueOption[];
-        } else {
-          throw new Error("NVIDIA API response is not a JSON array");
-        }
+        const errText = await response.text();
+        console.warn(`[LLM] NVIDIA API status ${response.status}: ${errText.slice(0, 150)}`);
       }
-    } catch (error) {
-      console.error("Error generating dialogue with NVIDIA API:", error);
-      // Continue to fallback
+    } catch (error: any) {
+      console.warn("[LLM] NVIDIA error:", error.message || error);
     }
   }
 
-  if (nvidiaResult) return nvidiaResult;
+  // 3. Google Gemini path (when key is standard Google AI key)
+  if (rawKey && !rawKey.startsWith("sk-") && !rawKey.startsWith("nvapi-")) {
+    try {
+      const genAI = new GoogleGenerativeAI(rawKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-  // Default: Google Gemini path
-  try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    // Build multi-turn chat contents
-    const contents: any[] = [];
-    if (params.history && params.history.length > 0) {
-      params.history.forEach((turn) => {
-        contents.push({
-          role: turn.role === "model" ? "model" : "user",
-          parts: [{ text: turn.text }],
+      const contents: any[] = [];
+      if (params.history && params.history.length > 0) {
+        params.history.forEach((turn) => {
+          contents.push({
+            role: turn.role === "model" ? "model" : "user",
+            parts: [{ text: turn.text }],
+          });
         });
+      }
+      contents.push({ role: "user", parts: [{ text: systemPrompt }] });
+
+      const result = await model.generateContent({
+        contents,
+        generationConfig: {
+          responseMimeType: "application/json",
+        },
       });
-    }
-    contents.push({ role: "user", parts: [{ text: systemPrompt }] });
 
-    const result = await model.generateContent({
-      contents,
-      generationConfig: {
-        responseMimeType: "application/json",
-      },
-    });
-
-    const text = result.response.text();
-    const parsed = JSON.parse(text);
-    if (Array.isArray(parsed)) {
-      return parsed as DialogueOption[];
+      const text = result.response.text();
+      const parsed = JSON.parse(text);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed as DialogueOption[];
+      }
+    } catch (error: any) {
+      console.warn("[LLM] Gemini error:", error.message || error);
     }
-    throw new Error("Invalid response format from Gemini");
-  } catch (error) {
-    console.error("Error generating dialogue with Gemini API:", error);
-    return generateMockDialogue(params);
   }
+
+  return generateMockDialogue(params);
 }
 
 function generateMockDialogue(params: GenerateDialogueParams): DialogueOption[] {
-  // Simple realistic dynamic mock responses based on character backstory/context
-  const words = (params.backstory + " " + params.context).toLowerCase();
-  
-  if (words.includes("wizard") || words.includes("magic") || words.includes("spell")) {
+  const context = (params.context || "").toLowerCase();
+  if (context.includes("drink") || context.includes("ale") || context.includes("bartender")) {
     return [
-      {
-        text: `Ah, traveler. The ley lines are whispering of your arrival. What brings you to my sanctum?`,
-        emotion: "Mysterious",
-        metadata: { questTrigger: "wizard_intro" }
-      },
-      {
-        text: `Be careful where you step. An unstable rift is nearby. Are you prepared to learn the arcane arts?`,
-        emotion: "Serious",
-      },
-      {
-        text: `Ha! A mortal seeking magical secrets. Do you possess the discipline required?`,
-        emotion: "Excited",
-      }
+      { text: "Here's our finest brew! Straight from the cellar casks.", emotion: "Friendly" },
+      { text: "Rough day on the road? Sit back, take a sip, and relax.", emotion: "Warm" },
+      { text: "Careful with that one — it's got quite a kick!", emotion: "Playful" },
     ];
   }
-
-  if (words.includes("shop") || words.includes("merchant") || words.includes("buy") || words.includes("sell")) {
+  if (context.includes("quest") || context.includes("adventure") || context.includes("wizard")) {
     return [
-      {
-        text: `Welcome, customer! I have the finest wares in the realm. What are you looking for today?`,
-        emotion: "Excited",
-        metadata: { openStore: true }
-      },
-      {
-        text: `Looking to sell some loot, or just browsing? I pay fair prices.`,
-        emotion: "Neutral",
-      },
-      {
-        text: `No refunds, remember that. But I do have a special discount on healing potions if you are interested.`,
-        emotion: "Friendly",
-      }
+      { text: "The path ahead is dangerous, but fortunes favor the bold.", emotion: "Mysterious" },
+      { text: "I've heard rumors of ancient magic stirring in the ruins nearby.", emotion: "Thoughtful" },
+      { text: "Take this advice: always keep your wits sharp and your blade ready.", emotion: "Encouraging" },
     ];
   }
-
-  // Default fallback
   return [
     {
-      text: `Hello there. My name is ${params.npcName}. How can I assist you in your quest?`,
+      text: `Hey there! It's so great talking with you. What's on your mind today, my friend?`,
       emotion: "Friendly",
     },
     {
-      text: `Hmm, I don't know much about that, but the world is full of dangers. Stay safe.`,
-      emotion: "Serious",
+      text: `That's a really interesting point! I love discussing things like this with you.`,
+      emotion: "Thoughtful",
     },
     {
-      text: `Interesting. Let's see what happens next.`,
-      emotion: "Thoughtful",
+      text: `Haha, I totally agree! Tell me more about what you're up to!`,
+      emotion: "Excited",
     }
   ];
 }
+

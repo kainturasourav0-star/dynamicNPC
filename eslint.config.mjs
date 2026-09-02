@@ -4,7 +4,8 @@ export default [
       ".next/**",
       "node_modules/**",
       "scratch/**",
-      "dist/**"
+      "dist/**",
+      "omnivoice-studio/**"
     ]
   }
 ];

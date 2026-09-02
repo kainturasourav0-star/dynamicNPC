@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { BookOpen, Code, Terminal, Play, ShieldAlert, Cpu, Clipboard, Check } from "lucide-react";
+import { BookOpen, Code, Terminal, Play, ShieldAlert, Cpu, Copy, Check, ExternalLink } from "lucide-react";
+import { PageHeader } from "@/components/console/ConsoleUI";
 
 export default function DocsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -157,119 +158,116 @@ public class NpcDialogueClient : MonoBehaviour
 }`;
 
   return (
-    <div className="space-y-8 max-w-5xl">
-      {/* Header */}
-      <div className="border-b border-[#2F323B] pb-6">
-        <p className="font-mono text-cyan-400 text-[10px] uppercase tracking-[0.3em] mb-2">Developer Reference</p>
-        <h1 className="text-3xl font-black tracking-tighter text-white uppercase flex items-center gap-3">
-          <BookOpen className="w-7 h-7 text-cyan-400" />
-          Integration Guide
-        </h1>
-        <p className="text-slate-400 text-sm mt-1">
-          Connect your game clients to the metered NPC Dialogue service using the x402 protocol specification.
-        </p>
-      </div>
+    <div className="space-y-8 max-w-5xl mx-auto">
+      {/* ─── Page Header ────────────────────────────────────────── */}
+      <PageHeader
+        badge="Protocol Specification"
+        title="Integration Guide & API Reference"
+        description="Connect your game clients to the metered NPC Dialogue service using the x402 HTTP standard and EIP-191 signatures."
+      />
 
-      {/* Overview Card */}
-      <div className="bg-[#0c0c0c] border border-[#2F323B] p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="space-y-2">
-          <div className="p-2 bg-cyan-500/10 text-cyan-400 w-fit">
-            <Cpu className="w-5 h-5" />
+      {/* ─── 3-Step Overview Cards ──────────────────────────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="rounded-2xl bg-[#0F141A] border border-white/[0.08] p-6 space-y-3 shadow-sm">
+          <div className="w-9 h-9 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+            <Cpu className="w-4 h-4" />
           </div>
-          <h3 className="font-bold text-slate-200 text-sm uppercase tracking-tight">01. Challenge-Response</h3>
+          <h3 className="font-bold text-white text-sm">01. Challenge-Response</h3>
           <p className="text-xs text-slate-400 leading-relaxed">
-            Metered calls to <code className="text-cyan-400">/api/generate-dialogue</code> return HTTP 402 Payment Required containing a challenge payload.
+            Metered calls to <code className="text-cyan-400 font-mono text-[11px]">/api/generate-dialogue</code> return HTTP 402 Payment Required containing the challenge payload.
           </p>
         </div>
 
-        <div className="space-y-2">
-          <div className="p-2 bg-amber-500/10 text-amber-400 w-fit">
-            <Code className="w-5 h-5" />
+        <div className="rounded-2xl bg-[#0F141A] border border-white/[0.08] p-6 space-y-3 shadow-sm">
+          <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400">
+            <Code className="w-4 h-4" />
           </div>
-          <h3 className="font-bold text-slate-200 text-sm uppercase tracking-tight">02. Client Signature</h3>
+          <h3 className="font-bold text-white text-sm">02. Client Signature</h3>
           <p className="text-xs text-slate-400 leading-relaxed">
-            The game client signs the challenge using EIP-191 personal_sign, authorizing the USDC micropayment.
+            The game client or player wallet signs the challenge using EIP-191 personal_sign, authorizing the USDC micropayment.
           </p>
         </div>
 
-        <div className="space-y-2">
-          <div className="p-2 bg-lime-500/10 text-lime-400 w-fit">
-            <Play className="w-5 h-5" />
+        <div className="rounded-2xl bg-[#0F141A] border border-white/[0.08] p-6 space-y-3 shadow-sm">
+          <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+            <Play className="w-4 h-4" />
           </div>
-          <h3 className="font-bold text-slate-200 text-sm uppercase tracking-tight">03. Settle & Generate</h3>
+          <h3 className="font-bold text-white text-sm">03. Settle & Stream</h3>
           <p className="text-xs text-slate-400 leading-relaxed">
-            Client retries with signature. API verifies, settles the USDC transaction, and executes the LLM generator.
+            Client retries with signature. API verifies, settles the USDC transaction, and executes the low-latency LLM generator.
           </p>
         </div>
       </div>
 
-      <div className="bg-[#0c0c0c] border border-[#2F323B] p-6 space-y-4">
+      {/* ─── cURL CLI Snippet ───────────────────────────────────── */}
+      <div className="rounded-2xl bg-[#0F141A] border border-white/[0.08] p-6 space-y-4 shadow-sm">
         <div className="flex justify-between items-center">
-          <h3 className="font-bold text-slate-200 flex items-center gap-2 font-mono uppercase text-xs tracking-wider">
-            <Terminal className="w-4 h-4 text-slate-400" />
+          <h3 className="font-bold text-white flex items-center gap-2 text-xs">
+            <Terminal className="w-4 h-4 text-cyan-400" />
             Quick Test (cURL CLI)
           </h3>
           <button
             onClick={() => handleCopy(curlSnippet, "curl")}
-            className="flex items-center gap-1.5 text-[9px] text-slate-400 hover:text-white bg-[#050505] px-2.5 py-1.5 border border-[#2F323B] transition font-mono uppercase tracking-wider"
+            className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white bg-[#07090C] px-3 py-1.5 rounded-xl border border-white/[0.08] transition"
           >
             {copiedId === "curl" ? (
-              <><Check className="w-3.5 h-3.5 text-lime-400" /> Copied</>
+              <><Check className="w-3.5 h-3.5 text-emerald-400" /> Copied</>
             ) : (
-              <><Clipboard className="w-3.5 h-3.5" /> Copy Snippet</>
+              <><Copy className="w-3.5 h-3.5 text-slate-400" /> Copy Snippet</>
             )}
           </button>
         </div>
-        <pre className="font-mono text-xs text-cyan-300 bg-[#050505] p-4 overflow-x-auto border border-[#2F323B] max-h-[300px]">
+        <pre className="font-mono text-xs text-cyan-300 bg-[#07090C] p-4 rounded-xl overflow-x-auto border border-white/[0.06] max-h-[300px]">
           {curlSnippet}
         </pre>
       </div>
 
-      {/* Node/Ethers Example */}
-      <div className="bg-[#0c0c0c] border border-[#2F323B] p-6 space-y-4">
+      {/* ─── Node.js / TypeScript Example ───────────────────────── */}
+      <div className="rounded-2xl bg-[#0F141A] border border-white/[0.08] p-6 space-y-4 shadow-sm">
         <div className="flex justify-between items-center">
-          <h3 className="font-bold text-slate-200 flex items-center gap-2 font-mono uppercase text-xs tracking-wider">
+          <h3 className="font-bold text-white flex items-center gap-2 text-xs">
             <Code className="w-4 h-4 text-cyan-400" />
             Node.js / TypeScript Client
           </h3>
           <button
             onClick={() => handleCopy(nodeSnippet, "node")}
-            className="flex items-center gap-1.5 text-[9px] text-slate-400 hover:text-white bg-[#050505] px-2.5 py-1.5 border border-[#2F323B] transition font-mono uppercase tracking-wider"
+            className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white bg-[#07090C] px-3 py-1.5 rounded-xl border border-white/[0.08] transition"
           >
             {copiedId === "node" ? (
-              <><Check className="w-3.5 h-3.5 text-lime-400" /> Copied</>
+              <><Check className="w-3.5 h-3.5 text-emerald-400" /> Copied</>
             ) : (
-              <><Clipboard className="w-3.5 h-3.5" /> Copy Snippet</>
+              <><Copy className="w-3.5 h-3.5 text-slate-400" /> Copy Snippet</>
             )}
           </button>
         </div>
-        <pre className="font-mono text-xs text-cyan-300 bg-[#050505] p-4 overflow-x-auto border border-[#2F323B] max-h-[300px]">
+        <pre className="font-mono text-xs text-cyan-300 bg-[#07090C] p-4 rounded-xl overflow-x-auto border border-white/[0.06] max-h-[300px]">
           {nodeSnippet}
         </pre>
       </div>
 
-      {/* Unity C# Example */}
-      <div className="bg-[#0c0c0c] border border-[#2F323B] p-6 space-y-4">
+      {/* ─── Unity Engine (C#) Example ──────────────────────────── */}
+      <div className="rounded-2xl bg-[#0F141A] border border-white/[0.08] p-6 space-y-4 shadow-sm">
         <div className="flex justify-between items-center">
-          <h3 className="font-bold text-slate-200 flex items-center gap-2 font-mono uppercase text-xs tracking-wider">
-            <Code className="w-4 h-4 text-lime-400" />
+          <h3 className="font-bold text-white flex items-center gap-2 text-xs">
+            <Code className="w-4 h-4 text-emerald-400" />
             Unity Engine Integration (C#)
           </h3>
           <button
             onClick={() => handleCopy(csharpSnippet, "csharp")}
-            className="flex items-center gap-1.5 text-[9px] text-slate-400 hover:text-white bg-[#050505] px-2.5 py-1.5 border border-[#2F323B] transition font-mono uppercase tracking-wider"
+            className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white bg-[#07090C] px-3 py-1.5 rounded-xl border border-white/[0.08] transition"
           >
             {copiedId === "csharp" ? (
-              <><Check className="w-3.5 h-3.5 text-lime-400" /> Copied</>
+              <><Check className="w-3.5 h-3.5 text-emerald-400" /> Copied</>
             ) : (
-              <><Clipboard className="w-3.5 h-3.5" /> Copy Snippet</>
+              <><Copy className="w-3.5 h-3.5 text-slate-400" /> Copy Snippet</>
             )}
           </button>
         </div>
-        <pre className="font-mono text-xs text-cyan-300 bg-[#050505] p-4 overflow-x-auto border border-[#2F323B] max-h-[300px]">
+        <pre className="font-mono text-xs text-cyan-300 bg-[#07090C] p-4 rounded-xl overflow-x-auto border border-white/[0.06] max-h-[300px]">
           {csharpSnippet}
         </pre>
       </div>
     </div>
   );
 }
+

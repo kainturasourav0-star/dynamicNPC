@@ -2,37 +2,56 @@
 node_modules/
 .pnp
 .pnp.js
+bun.lockb
 
-# Next.js
+# Next.js & Build Outputs
 .next/
 out/
 build/
+dist/
 
 # Environment variables (NEVER commit secrets)
 .env
 .env*.local
 .env.production
+.env.staging
 
-# Debug
+# Debug & Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
 
-# OS
+# OS & Editor
 .DS_Store
 Thumbs.db
+.vscode/
+.idea/
 
-# Vercel
-.vercel
+# Vercel & Auth Cache
+.vercel/
+.clerk/
 
-# Local DB state (mock)
+# Local DB state & caches
 db-state.json
-
-# Scratch / test files
 scratch/
+.freebuff/
+.agents/
 
-.vercel
+# Archives & Temporary binaries
+*.zip
+*.tar.gz
+*.mp3
+*.wav
+
+# OmniVoice Studio Submodule Caches
+omnivoice-studio/.venv/
+omnivoice-studio/**/node_modules/
+omnivoice-studio/**/__pycache__/
+omnivoice-studio/**/.pytest_cache/
+omnivoice-studio/.git/
+omnivoice-studio/.planning/

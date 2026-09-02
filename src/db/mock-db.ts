@@ -86,6 +86,11 @@ function populateRelations(tableName: string, record: any, withOpt: any) {
       result.paymentReceipts = storage.payment_receipts.filter(r => r.requestId === result.id);
     }
   }
+  if (tableName === 'conversation_history') {
+    if (withOpt.npcProfile) {
+      result.npcProfile = storage.npc_profiles.find(n => n.id === result.npcId);
+    }
+  }
   
   return result;
 }

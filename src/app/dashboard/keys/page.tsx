@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Key, Plus, Trash2, Copy, Check, EyeOff, Shield } from "lucide-react";
+import { Key, Plus, Trash2, Copy, Check, EyeOff, Shield, ShieldCheck, Zap } from "lucide-react";
 
 interface ApiKey {
   id: string;
@@ -80,127 +80,152 @@ export default function KeysPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-cyan-400"></div>
-          <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">Loading Keys...</span>
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-cyan-400"></div>
+          <span className="font-mono text-xs uppercase tracking-widest text-slate-400">Loading Keys...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 max-w-5xl">
+    <div className="space-y-10 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="border-b border-[#2F323B] pb-6">
-        <p className="font-mono text-cyan-400 text-[10px] uppercase tracking-[0.3em] mb-2">Auth Management</p>
-        <h1 className="text-3xl font-black tracking-tighter text-white uppercase flex items-center gap-3">
-          <Key className="w-7 h-7 text-cyan-400" />
+      <div className="pb-6 border-b border-white/10">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono text-[11px] font-semibold">
+            Authentication & Access
+          </span>
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white flex items-center gap-3">
           API Credentials
         </h1>
-        <p className="text-slate-400 text-sm mt-1">
-          Manage high-entropy authorization keys to authenticate your game clients with the dialogue service.
+        <p className="text-slate-400 text-sm mt-1.5 max-w-2xl leading-relaxed">
+          Generate and manage authorization credentials to integrate NPC dialogue into Unity, Unreal Engine, Web, and mobile game engines.
         </p>
       </div>
 
       {/* Warning if new key is created */}
       {createdKey && (
-        <div className="bg-amber-500/5 border border-amber-500/30 p-6 space-y-3 relative">
-          <div className="flex items-center gap-2 text-amber-400 font-bold text-sm font-mono uppercase tracking-wider">
-            <EyeOff className="w-5 h-5" />
-            ⚠ Copy your API Key now — it will never be shown again!
+        <div className="rounded-2xl bg-amber-500/10 border border-amber-500/30 p-6 sm:p-7 space-y-4 shadow-xl animate-in fade-in duration-200">
+          <div className="flex items-center gap-2.5 text-amber-400 font-bold text-sm">
+            <EyeOff className="w-5 h-5 flex-shrink-0" />
+            <span>Copy your API Key now — it will not be shown again!</span>
           </div>
           <p className="text-slate-300 text-xs leading-relaxed max-w-2xl">
-            For security reasons, we store only cryptographic hashes of your API keys. We cannot recover this key. If you lose it, you must revoke it and generate a new one.
+            For security, keys are stored as irreversible cryptographic hashes (SHA-256). If you lose this key, you will need to revoke it and generate a replacement.
           </p>
-          <div className="flex items-center gap-2 bg-[#050505] p-3 border border-amber-500/20 font-mono text-sm max-w-xl">
-            <span className="text-lime-400 flex-1 truncate">{createdKey}</span>
+          <div className="flex items-center gap-3 bg-[#0a0e18] p-3.5 rounded-xl border border-amber-500/25 max-w-2xl">
+            <span className="text-emerald-400 font-mono text-sm flex-1 truncate select-all">{createdKey}</span>
             <button
               onClick={() => handleCopy(createdKey, "created")}
-              className="p-1.5 hover:bg-white/10 transition text-slate-400 hover:text-white"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition text-slate-200 text-xs font-semibold"
             >
-              {copiedId === "created" ? <Check className="w-4 h-4 text-lime-400" /> : <Copy className="w-4 h-4" />}
+              {copiedId === "created" ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+              <span>{copiedId === "created" ? "Copied!" : "Copy"}</span>
             </button>
           </div>
           <button
             onClick={() => setCreatedKey(null)}
-            className="text-xs text-slate-400 hover:text-white underline mt-2 block font-mono"
+            className="text-xs text-slate-400 hover:text-white underline font-mono transition"
           >
-            I have copied the key — dismiss this warning
+            I have saved the key securely — dismiss this message
           </button>
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Create Form */}
-        <div className="bg-[#0c0c0c] border border-[#2F323B] p-6 h-fit space-y-4">
-          <h3 className="font-bold text-slate-200 flex items-center gap-2 font-mono uppercase tracking-wider text-xs">
-            <Plus className="w-4 h-4 text-cyan-400" />
-            Generate New Key
-          </h3>
+        <div className="rounded-2xl bg-[#0a0e18] border border-white/10 p-6 sm:p-7 h-fit space-y-5 shadow-xl">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+              <Plus className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="font-bold text-base text-white">
+                Generate API Key
+              </h3>
+              <p className="text-xs text-slate-400">For server or client runtime</p>
+            </div>
+          </div>
+
           <form onSubmit={handleCreateKey} className="space-y-4">
             <div>
-              <label className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block mb-1">Key Name / Description</label>
+              <label className="text-xs text-slate-300 font-medium block mb-1.5">Key Name / Client Tag</label>
               <input
                 type="text"
                 required
-                placeholder="e.g. Production Game Client"
+                placeholder="e.g. Unreal Engine Client (Prod)"
                 value={newKeyName}
                 onChange={(e) => setNewKeyName(e.target.value)}
-                className="w-full bg-[#050505] border border-[#2F323B] rounded-none px-3 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-cyan-400 transition placeholder-slate-700"
+                className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-cyan-400 transition placeholder-slate-600"
               />
             </div>
             <button
               type="submit"
-              className="w-full bg-cyan-400 hover:bg-white text-black font-bold py-2.5 rounded-none text-xs font-mono uppercase tracking-wider transition"
+              className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-cyan-500/20"
             >
-              Generate API Key
+              Generate New Key
             </button>
           </form>
 
           {/* Key info box */}
-          <div className="border-t border-[#2F323B] pt-4">
-            <div className="flex gap-2 text-[10px] text-slate-500 font-mono leading-relaxed">
-              <Shield className="w-3 h-3 flex-shrink-0 mt-0.5 text-cyan-400/50" />
-              <span>Keys are hashed with SHA-256. The raw value is shown only once upon creation.</span>
+          <div className="border-t border-white/5 pt-4">
+            <div className="flex gap-2.5 text-xs text-slate-400 leading-relaxed">
+              <ShieldCheck className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
+              <span>Keys utilize bearer authentication with request-level rate limiting and signature auditing.</span>
             </div>
           </div>
         </div>
 
         {/* Keys List */}
-        <div className="lg:col-span-2 bg-[#0c0c0c] border border-[#2F323B] p-6 space-y-6">
-          <h3 className="font-bold text-slate-200 flex items-center gap-2 font-mono uppercase tracking-wider text-xs">
-            <Key className="w-4 h-4 text-cyan-400" />
-            Active API Keys
-          </h3>
+        <div className="lg:col-span-2 rounded-2xl bg-[#0a0e18] border border-white/10 p-6 sm:p-7 space-y-6 shadow-xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+                <Key className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="font-bold text-base text-white">
+                  Active API Keys ({keys.length})
+                </h3>
+                <p className="text-xs text-slate-400">Authorized application keys</p>
+              </div>
+            </div>
+          </div>
 
           {keys.length === 0 ? (
-            <div className="text-center py-12 border border-dashed border-[#2F323B] text-slate-500 text-xs font-mono">
-              <Key className="w-8 h-8 mx-auto mb-3 opacity-20" />
-              <p>No active API keys found.</p>
-              <p className="mt-1 text-slate-600">Use the panel on the left to generate one.</p>
+            <div className="text-center py-16 px-4 rounded-xl border border-dashed border-white/10 bg-white/[0.01]">
+              <Key className="w-10 h-10 mx-auto mb-3 text-slate-600" />
+              <p className="text-sm font-semibold text-slate-200">No active API keys found</p>
+              <p className="text-xs text-slate-400 mt-1">Generate a key to connect your game client to the NPC-402 protocol.</p>
             </div>
           ) : (
             <div className="space-y-3">
               {keys.map((k) => (
                 <div
                   key={k.id}
-                  className="flex items-center justify-between p-4 bg-[#050505] border border-[#2F323B] hover:border-cyan-400/20 transition"
+                  className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-cyan-500/30 transition-all duration-200 group"
                 >
-                  <div className="space-y-1 flex-1 min-w-0">
-                    <div className="font-bold text-slate-200 text-sm uppercase tracking-tight">{k.name}</div>
-                    <div className="font-mono text-[10px] text-slate-500 flex items-center gap-1.5 truncate">
+                  <div className="space-y-1 flex-1 min-w-0 pr-4">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-slate-100 text-sm tracking-tight">{k.name}</span>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-mono font-medium">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Active
+                      </span>
+                    </div>
+                    <div className="font-mono text-xs text-slate-400 truncate">
                       {k.displayKey}
-                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-lime-500 flex-shrink-0" title="Active"></span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 ml-4 flex-shrink-0">
-                    <span className="text-[9px] text-slate-600 font-mono hidden sm:inline-block uppercase tracking-wider">
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <span className="text-xs text-slate-500 font-mono hidden sm:inline-block">
                       {new Date(k.createdAt).toLocaleDateString()}
                     </span>
                     <button
                       onClick={() => handleDeleteKey(k.id)}
-                      className="p-2 hover:bg-rose-500/10 text-rose-400 hover:text-rose-300 transition border border-transparent hover:border-rose-500/20"
-                      title="Revoke API Key"
+                      className="p-2 rounded-lg bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-white/5 transition"
+                      title="Revoke Key"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

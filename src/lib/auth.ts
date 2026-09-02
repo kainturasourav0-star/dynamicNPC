@@ -1,38 +1,39 @@
 import { db, eq } from "@/db";
-import { users } from "@/db/schema";
-import { cookies } from "next/headers";
-
+import { users, projects } from "@/db/schema";
+import { auth, currentUser } from "@clerk/nextjs/server";
 
 export async function getSessionUser() {
-  const cookieStore = await cookies();
-  const userId = cookieStore.get("userId")?.value;
-  
-  if (!userId) {
-    return null;
-  }
-
   try {
+    let email: string | null = null;
+    try {
+      const { userId } = await auth();
+      if (userId) {
+        const clerkUser = await currentUser();
+        email = clerkUser?.emailAddresses[0]?.emailAddress || null;
+      }
+    } catch {
+      // Clerk session not found or running in dev fallback mode
+    }
+
+    // Default to developer account for dev / preview fallback
+    const targetEmail = email || "developer@npc402.dev";
+
     let user = await db.query.users.findFirst({
-      where: eq(users.id, userId),
+      where: eq(users.email, targetEmail),
       with: {
         projects: true,
       },
     });
 
-    // If using mock DB and session user was evicted from serverless memory, restore it dynamically
-    const { isRealDb } = await import("@/db");
-    if (!user && !isRealDb) {
-      console.log(`Evicted mock user ${userId} detected, restoring dynamically...`);
-      const { users: usersTable, projects: projectsTable } = await import("@/db/schema");
-      
-      const [newUser] = await db.insert(usersTable).values({
-        id: userId,
-        email: "developer@hackathon.com",
-        passwordHash: "password",
+    if (!user) {
+      console.log(`[Auth] Initializing developer profile for ${targetEmail}...`);
+      const [newUser] = await db.insert(users).values({
+        email: targetEmail,
+        passwordHash: "clerk_managed",
       }).returning();
 
-      const [newProj] = await db.insert(projectsTable).values({
-        name: "My First Game Project",
+      const [newProj] = await db.insert(projects).values({
+        name: "Cyberpunk Realm RPG",
         userId: newUser.id,
       }).returning();
 
@@ -42,7 +43,7 @@ export async function getSessionUser() {
       };
     }
 
-    return user || null;
+    return user;
   } catch (error) {
     console.error("Error fetching session user:", error);
     return null;
@@ -50,7 +51,6 @@ export async function getSessionUser() {
 }
 
 export async function logout() {
-  const cookieStore = await cookies();
-  cookieStore.delete("userId");
-  cookieStore.delete("projectId");
+  // Client handles Clerk sign-out
 }
+

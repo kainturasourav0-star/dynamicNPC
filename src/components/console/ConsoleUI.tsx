@@ -1,19 +1,21 @@
 import React from "react";
 import Link from "next/link";
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, icons } from "lucide-react";
+
+const ArrowUpRight = icons.ArrowUpRight;
 
 // ─── Design Tokens & Theme Classes ─────────────────────────
 export const CONSOLE_THEME = {
-  bg: "bg-[#07090C]",
-  surface: "bg-[#0B0F14]",
-  card: "bg-[#0F141A]",
-  cardElevated: "bg-[#121820]",
-  cardHover: "hover:bg-[#151C26] hover:border-white/15",
+  bg: "bg-[#05070A]",
+  surface: "bg-[#090D14]",
+  card: "bg-[#0D121B]",
+  cardElevated: "bg-[#111723]",
+  cardHover: "hover:bg-[#141C2B] hover:border-cyan-500/30",
   border: "border-white/[0.08]",
   borderHover: "border-white/20",
   borderCyan: "border-cyan-500/30",
   cyanText: "text-cyan-400",
-  cyanGlow: "shadow-[0_0_20px_rgba(6,182,212,0.15)]",
+  cyanGlow: "shadow-[0_0_35px_rgba(0,229,255,0.18)]",
 };
 
 // ─── Page Header Component ─────────────────────────────────
@@ -27,26 +29,28 @@ interface PageHeaderProps {
 
 export function PageHeader({ badge, title, description, icon: Icon, actions }: PageHeaderProps) {
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/[0.08]">
-      <div>
+    <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-8 border-b border-white/[0.08]">
+      <div className="space-y-2.5">
         {badge && (
-          <div className="flex items-center gap-2 mb-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[11px] font-mono font-medium tracking-wide">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/25 text-xs font-mono font-medium tracking-wide shadow-sm shadow-cyan-500/10">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(0,229,255,0.8)]" />
               {badge}
             </span>
           </div>
         )}
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-          {Icon && <Icon className="w-6 h-6 text-cyan-400 flex-shrink-0" />}
-          <span>{title}</span>
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white flex items-center gap-4 font-display">
+          {Icon && <Icon className="w-8 h-8 text-cyan-400 flex-shrink-0" />}
+          <span className="bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">
+            {title}
+          </span>
         </h1>
-        <p className="text-slate-400 text-sm mt-1 max-w-2xl leading-relaxed">
+        <p className="text-slate-400 text-sm sm:text-base max-w-3xl leading-relaxed">
           {description}
         </p>
       </div>
       {actions && (
-        <div className="flex items-center gap-3 flex-wrap flex-shrink-0">
+        <div className="flex items-center gap-3.5 flex-wrap flex-shrink-0">
           {actions}
         </div>
       )}
@@ -54,7 +58,7 @@ export function PageHeader({ badge, title, description, icon: Icon, actions }: P
   );
 }
 
-// ─── Metric Card Component (Linear / Stripe Style) ─────────
+// ─── Ultra-Premium Metric Card Component ───────────────────
 interface MetricCardProps {
   title: string;
   value: string | number;
@@ -63,6 +67,7 @@ interface MetricCardProps {
   isPositive?: boolean;
   icon: LucideIcon;
   trendData?: number[];
+  accentColor?: "cyan" | "emerald" | "amber" | "violet";
 }
 
 export function MetricCard({
@@ -72,56 +77,95 @@ export function MetricCard({
   change,
   isPositive = true,
   icon: Icon,
-  trendData = [20, 35, 30, 45, 60, 55, 75, 70, 90],
+  trendData = [25, 35, 30, 50, 65, 60, 85, 80, 95],
+  accentColor = "cyan",
 }: MetricCardProps) {
-  return (
-    <div className="relative group bg-[#0F141A] hover:bg-[#121820] border border-white/[0.08] hover:border-cyan-500/30 rounded-2xl p-5 sm:p-6 transition-all duration-200 shadow-sm hover:shadow-xl hover:shadow-cyan-500/5 flex flex-col justify-between overflow-hidden">
-      {/* Ambient background glow on hover */}
-      <div className="absolute -top-12 -right-12 w-28 h-28 bg-cyan-500/5 rounded-full blur-2xl group-hover:bg-cyan-500/10 transition-all duration-300 pointer-events-none" />
+  const accentBorder = {
+    cyan: "group-hover:border-cyan-400/50 hover:shadow-cyan-500/10",
+    emerald: "group-hover:border-emerald-400/50 hover:shadow-emerald-500/10",
+    amber: "group-hover:border-amber-400/50 hover:shadow-amber-500/10",
+    violet: "group-hover:border-purple-400/50 hover:shadow-purple-500/10",
+  }[accentColor];
 
-      <div>
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <span className="text-xs font-medium uppercase tracking-wider text-slate-400 font-mono">
+  const accentBg = {
+    cyan: "bg-cyan-500/10 text-cyan-300 border-cyan-500/25",
+    emerald: "bg-emerald-500/10 text-emerald-300 border-emerald-500/25",
+    amber: "bg-amber-500/10 text-amber-300 border-amber-500/25",
+    violet: "bg-purple-500/10 text-purple-300 border-purple-500/25",
+  }[accentColor];
+
+  const strokeColor = {
+    cyan: "#00e5ff",
+    emerald: "#10b981",
+    amber: "#f59e0b",
+    violet: "#a855f7",
+  }[accentColor];
+
+  const gradId = `grad-${accentColor}-${title.replace(/\s+/g, "")}`;
+
+  // Generate SVG path for area fill and stroke
+  const points = trendData.map((d, i) => `${(i / (trendData.length - 1)) * 100},${30 - (d / 100) * 26}`).join(" ");
+  const areaPath = `M 0 30 L ${points} L 100 30 Z`;
+
+  return (
+    <div className={`relative group bg-[#0D121B] hover:bg-[#111723] border border-white/[0.08] ${accentBorder} rounded-2xl p-6 sm:p-7 transition-all duration-300 shadow-xl hover:shadow-2xl flex flex-col justify-between overflow-hidden`}>
+      {/* Ambient background glow on hover */}
+      <div className="absolute -top-20 -right-20 w-44 h-44 bg-cyan-500/[0.04] group-hover:bg-cyan-500/[0.08] rounded-full blur-3xl transition-all duration-500 pointer-events-none" />
+
+      <div className="space-y-4 relative z-10">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 font-mono">
             {title}
           </span>
-          <div className="w-8 h-8 rounded-xl bg-white/[0.04] group-hover:bg-cyan-500/10 border border-white/[0.06] group-hover:border-cyan-500/20 flex items-center justify-center text-slate-400 group-hover:text-cyan-400 transition-colors">
-            <Icon className="w-4 h-4" />
+          <div className={`w-11 h-11 rounded-xl ${accentBg} border flex items-center justify-center transition-all group-hover:scale-110 duration-300 shadow-sm`}>
+            <Icon className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="flex items-baseline gap-2 mb-1">
-          <span className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-sans">
-            {value}
-          </span>
-          {change && (
-            <span
-              className={`text-xs font-semibold px-1.5 py-0.5 rounded-md ${
-                isPositive
-                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                  : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
-              }`}
-            >
-              {change}
+        <div className="space-y-1.5">
+          <div className="flex items-baseline gap-3">
+            <span className="text-3xl sm:text-4xl lg:text-[2.6rem] font-extrabold tracking-tight text-white font-display">
+              {value}
             </span>
-          )}
+            {change && (
+              <span
+                className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
+                  isPositive
+                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                    : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                }`}
+              >
+                {change}
+              </span>
+            )}
+          </div>
+          <p className="text-xs sm:text-sm text-slate-400 leading-normal font-sans">{subtitle}</p>
         </div>
-
-        <p className="text-xs text-slate-400 mt-1">{subtitle}</p>
       </div>
 
-      {/* Mini SVG Sparkline */}
-      <div className="mt-4 pt-3 border-t border-white/[0.04] flex items-center justify-between">
-        <svg className="w-24 h-6 overflow-visible opacity-70 group-hover:opacity-100 transition-opacity" viewBox="0 0 100 25">
+      {/* Mini SVG Area Fill Sparkline */}
+      <div className="mt-6 pt-4 border-t border-white/[0.05] flex items-center justify-between relative z-10">
+        <svg className="w-32 h-8 overflow-visible" viewBox="0 0 100 30">
+          <defs>
+            <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={strokeColor} stopOpacity="0.35" />
+              <stop offset="100%" stopColor={strokeColor} stopOpacity="0.0" />
+            </linearGradient>
+          </defs>
+          <path d={areaPath} fill={`url(#${gradId})`} />
           <polyline
             fill="none"
-            stroke="#00e5ff"
-            strokeWidth="2"
+            stroke={strokeColor}
+            strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            points={trendData.map((d, i) => `${(i / (trendData.length - 1)) * 100},${25 - (d / 100) * 20}`).join(" ")}
+            points={points}
           />
         </svg>
-        <span className="text-[11px] font-mono text-slate-500">Live telemetry</span>
+        <span className="text-[11px] font-mono text-slate-500 flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          Live Pulse
+        </span>
       </div>
     </div>
   );
@@ -130,21 +174,21 @@ export function MetricCard({
 // ─── Status Badge ──────────────────────────────────────────
 export function StatusBadge({ status, label }: { status: "success" | "pending" | "error" | "neutral"; label: string }) {
   const styles = {
-    success: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    pending: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-    error: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-    neutral: "bg-white/[0.04] text-slate-400 border-white/[0.08]",
+    success: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.15)]",
+    pending: "bg-amber-500/10 text-amber-300 border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.15)]",
+    error: "bg-rose-500/10 text-rose-300 border-rose-500/30 shadow-[0_0_10px_rgba(244,63,94,0.15)]",
+    neutral: "bg-white/[0.05] text-slate-300 border-white/[0.1]",
   }[status];
 
   const dot = {
-    success: "bg-emerald-400",
-    pending: "bg-amber-400 animate-pulse",
-    error: "bg-rose-400",
+    success: "bg-emerald-400 shadow-[0_0_6px_#10b981]",
+    pending: "bg-amber-400 animate-pulse shadow-[0_0_6px_#f59e0b]",
+    error: "bg-rose-400 shadow-[0_0_6px_#f43f5e]",
     neutral: "bg-slate-400",
   }[status];
 
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border font-mono ${styles}`}>
+    <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border font-mono ${styles}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
       {label}
     </span>
@@ -157,45 +201,36 @@ interface EmptyStateProps {
   title: string;
   description: string;
   actionText?: string;
-  onAction?: () => void;
   actionHref?: string;
+  onAction?: () => void;
 }
 
-export function EmptyState({
-  icon: Icon,
-  title,
-  description,
-  actionText,
-  onAction,
-  actionHref,
-}: EmptyStateProps) {
+export function EmptyState({ icon: Icon, title, description, actionText, actionHref, onAction }: EmptyStateProps) {
   return (
-    <div className="text-center py-16 px-6 rounded-2xl bg-[#0F141A] border border-dashed border-white/[0.12] flex flex-col items-center justify-center">
-      <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-4 shadow-lg shadow-cyan-500/5">
-        <Icon className="w-7 h-7" />
+    <div className="py-20 px-8 text-center border border-dashed border-white/[0.14] rounded-2xl bg-[#090D14]/70 backdrop-blur-md">
+      <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/25 text-cyan-400 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-cyan-500/10">
+        <Icon className="w-8 h-8" />
       </div>
-      <h3 className="text-base font-bold text-white tracking-tight">{title}</h3>
-      <p className="text-slate-400 text-xs mt-1.5 max-w-sm leading-relaxed">
+      <h3 className="text-xl font-bold text-white mb-2 font-display">{title}</h3>
+      <p className="text-slate-400 text-sm max-w-md mx-auto mb-8 leading-relaxed font-sans">
         {description}
       </p>
       {actionText && (
-        <div className="mt-5">
-          {actionHref ? (
-            <Link
-              href={actionHref}
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-bold text-xs px-5 py-2.5 rounded-xl shadow-lg shadow-cyan-500/20 transition-all duration-150"
-            >
-              {actionText}
-            </Link>
-          ) : (
-            <button
-              onClick={onAction}
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-bold text-xs px-5 py-2.5 rounded-xl shadow-lg shadow-cyan-500/20 transition-all duration-150"
-            >
-              {actionText}
-            </button>
-          )}
-        </div>
+        actionHref ? (
+          <Link
+            href={actionHref}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-bold text-xs transition shadow-lg shadow-cyan-500/25"
+          >
+            {actionText}
+          </Link>
+        ) : (
+          <button
+            onClick={onAction}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-bold text-xs transition shadow-lg shadow-cyan-500/25"
+          >
+            {actionText}
+          </button>
+        )
       )}
     </div>
   );

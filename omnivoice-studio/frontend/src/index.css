@@ -2358,3 +2358,258 @@ div[role="dialog"].audio-trimmer {
 .capture-pill-host > * {
   pointer-events: auto;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   ENHANCEMENT PACK — smooth animations, micro-interactions,
+   3D tilt cards, animated NavRail pill, quick stats, etc.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Page slide-in transition ──────────────────────────── */
+@keyframes pageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* ── 3D Tilt on Action Cards ───────────────────────────── */
+.lp-action-card {
+  transform-style: preserve-3d;
+  perspective: 600px;
+}
+.lp-action-card:hover {
+  transform:
+    translateY(-3px)
+    rotateX(var(--rot-x, 0deg))
+    rotateY(var(--rot-y, 0deg));
+  transition:
+    transform 0.12s ease,
+    background 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.lp-action-card:not(:hover) {
+  transform: translateY(0) rotateX(0deg) rotateY(0deg);
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+/* Deeper icon glow + bounce on 3D tilt */
+.lp-action-card:hover .card-icon {
+  transform: scale(1.08) translateZ(8px);
+  box-shadow: 0 0 24px -2px color-mix(in srgb, var(--card-hue, var(--chrome-accent)) 55%, transparent);
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
+}
+
+/* ── NavRail active pill indicator ────────────────────── */
+.nav-rail .rail-top {
+  position: relative; /* Contains the pill */
+}
+.rail-active-pill {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  border-radius: var(--chrome-radius-pill);
+  background: color-mix(in srgb, var(--pill-accent, var(--chrome-accent)) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--pill-accent, var(--chrome-accent)) 30%, transparent);
+  pointer-events: none;
+  z-index: 0;
+  transition:
+    top 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    height 0.18s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+  box-shadow: 0 0 12px -4px color-mix(in srgb, var(--pill-accent, var(--chrome-accent)) 40%, transparent);
+}
+
+/* Ensure button content renders above the pill */
+.rail-btn { z-index: 1; }
+
+/* Remove the old ::before bar indicator — pill replaces it */
+.rail-btn.active::before { display: none; }
+
+/* Keep accent color on active icon */
+.rail-btn.active {
+  background: transparent;
+  border-color: transparent;
+  color: var(--rail-accent, var(--chrome-accent));
+}
+
+/* ── Quick Stats Row on Launchpad ──────────────────────── */
+.lp-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.lp-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px 5px 10px;
+  border-radius: var(--chrome-radius-pill);
+  background: color-mix(in srgb, var(--stat-hue, var(--chrome-accent)) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--stat-hue, var(--chrome-accent)) 25%, transparent);
+  animation: lpFadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.lp-stat:nth-child(1) { animation-delay: 0.05s; }
+.lp-stat:nth-child(2) { animation-delay: 0.12s; }
+.lp-stat:nth-child(3) { animation-delay: 0.19s; }
+.lp-stat__icon {
+  color: var(--stat-hue, var(--chrome-accent));
+  display: flex;
+  align-items: center;
+}
+.lp-stat__value {
+  font-family: var(--chrome-font-mono);
+  font-size: var(--chrome-label-size);
+  font-weight: 700;
+  letter-spacing: var(--chrome-label-track);
+  color: var(--stat-hue, var(--chrome-accent));
+}
+.lp-stat__label {
+  font-family: var(--chrome-font-mono);
+  font-size: var(--chrome-label-size);
+  font-weight: 500;
+  color: var(--chrome-fg-muted);
+  letter-spacing: var(--chrome-label-track);
+  text-transform: uppercase;
+}
+
+/* ── Enhanced Empty State ──────────────────────────────── */
+.lp-empty__visual {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+/* Concentric pulsing rings */
+.lp-empty__ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid var(--chrome-accent-border);
+  animation: lpRingPulse 3s ease-in-out infinite;
+  pointer-events: none;
+}
+.lp-empty__ring--1 { inset: 0;       animation-delay: 0s;    opacity: 0.5; }
+.lp-empty__ring--2 { inset: -14px;   animation-delay: 0.6s;  opacity: 0.3; }
+.lp-empty__ring--3 { inset: -28px;   animation-delay: 1.2s;  opacity: 0.15; }
+@keyframes lpRingPulse {
+  0%, 100% { transform: scale(1);    opacity: inherit; }
+  50%      { transform: scale(1.08); opacity: calc(inherit * 1.5); }
+}
+.lp-empty__bars {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  z-index: 1;
+  position: relative;
+}
+
+/* CTA Buttons in empty state */
+.lp-empty__ctas {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.lp-empty__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-radius: var(--chrome-radius-pill);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
+  background: transparent;
+  border: 1px solid var(--chrome-border-strong);
+  color: var(--chrome-fg-muted);
+}
+.lp-empty__cta:hover {
+  background: var(--chrome-hover-bg);
+  color: var(--chrome-fg);
+  transform: translateY(-1px);
+}
+.lp-empty__cta--primary {
+  background: var(--chrome-accent-bg);
+  border-color: var(--chrome-accent-border);
+  color: var(--chrome-accent);
+}
+.lp-empty__cta--primary:hover {
+  background: color-mix(in srgb, var(--chrome-accent) 22%, transparent);
+  box-shadow: 0 0 18px -4px color-mix(in srgb, var(--chrome-accent) 45%, transparent);
+}
+.lp-empty__cta:active { transform: scale(0.97); }
+
+/* ── Button press ripple (global) ──────────────────────── */
+.btn-primary,
+.lp-empty__cta,
+.lp-demo-callout__btn {
+  overflow: hidden;
+}
+.btn-primary::after,
+.lp-empty__cta::after,
+.lp-demo-callout__btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+  opacity: 0;
+  transform: scale(0);
+  pointer-events: none;
+}
+.btn-primary:active:not(:disabled)::after,
+.lp-empty__cta:active::after,
+.lp-demo-callout__btn:active::after {
+  opacity: 1;
+  transform: scale(2.5);
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+/* ── Enhanced focus glow on inputs ────────────────────── */
+.input-base:focus {
+  border-color: color-mix(in srgb, var(--chrome-accent) 60%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--chrome-accent) 12%, transparent);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+/* ── Smooth scrollbar appearance ──────────────────────── */
+::-webkit-scrollbar-thumb {
+  transition: background 0.2s;
+}
+
+/* ── Reduced motion overrides for new animations ──────── */
+@media (prefers-reduced-motion: reduce) {
+  .rail-active-pill { transition: none !important; }
+  .lp-empty__ring  { animation: none !important; }
+  .lp-stat         { animation: none !important; opacity: 1; }
+  .lp-action-card,
+  .lp-action-card:hover {
+    transform: none !important;
+    transition: background 0.15s, border-color 0.15s !important;
+  }
+  @keyframes pageSlideIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+}

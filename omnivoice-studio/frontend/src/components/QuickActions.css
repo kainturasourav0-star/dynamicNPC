@@ -1,0 +1,214 @@
+/* ═══ QUICK ACTIONS FAB ═══
+   Floating action button with staggered radial menu.
+   --qa-hue drives each action item's accent.
+   --qa-delay drives per-item stagger timing.
+*/
+
+.qa-root {
+  position: fixed;
+  bottom: calc(var(--logs-footer-height, 28px) + 20px);
+  right: 20px;
+  z-index: 5000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+  pointer-events: none;
+}
+.qa-root > * { pointer-events: auto; }
+
+/* ── Backdrop ────────────────────────────────────────── */
+.qa-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 16, 17, 0.55);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 4990;
+  animation: qaBackdropIn 0.2s ease both;
+  pointer-events: auto;
+}
+@keyframes qaBackdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Action items list ───────────────────────────────── */
+.qa-items {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 5001;
+}
+.qa-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(12px) scale(0.9);
+  transition:
+    opacity 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) var(--qa-delay, 0ms),
+    transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) var(--qa-delay, 0ms);
+  pointer-events: none;
+}
+.qa-items--open .qa-item {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Label pill */
+.qa-item__label {
+  font-family: var(--font-sans, sans-serif);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--chrome-fg, #d5c4a1);
+  background: var(--chrome-bg, #0f1011);
+  border: 1px solid var(--chrome-border-strong, rgba(255,255,255,0.12));
+  border-radius: 3px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  opacity: 0.92;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Item button */
+.qa-item__btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--qa-hue, #d3869b) 15%, var(--chrome-bg, #0f1011));
+  border: 1.5px solid color-mix(in srgb, var(--qa-hue, #d3869b) 50%, transparent);
+  color: var(--qa-hue, #d3869b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.15s ease;
+  box-shadow:
+    0 0 0 0 transparent,
+    0 4px 12px rgba(0,0,0,0.4);
+  flex-shrink: 0;
+}
+.qa-item__btn:hover {
+  background: color-mix(in srgb, var(--qa-hue, #d3869b) 28%, var(--chrome-bg, #0f1011));
+  transform: scale(1.1);
+  box-shadow:
+    0 0 18px -2px color-mix(in srgb, var(--qa-hue, #d3869b) 50%, transparent),
+    0 4px 16px rgba(0,0,0,0.5);
+}
+.qa-item__btn:active {
+  transform: scale(0.96);
+}
+
+/* ── Main FAB ────────────────────────────────────────── */
+.qa-fab {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--chrome-accent-bg, rgba(243,165,182,0.12));
+  border: 1.5px solid var(--chrome-accent-border, rgba(243,165,182,0.35));
+  color: var(--chrome-accent, #f3a5b6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  z-index: 5002;
+  transition:
+    background 0.18s ease,
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+  box-shadow:
+    0 0 0 0 transparent,
+    0 4px 16px rgba(0,0,0,0.5),
+    0 0 0 1px rgba(255,255,255,0.04) inset;
+  overflow: hidden;
+}
+.qa-fab:hover {
+  background: color-mix(in srgb, var(--chrome-accent, #f3a5b6) 22%, transparent);
+  box-shadow:
+    0 0 28px -4px color-mix(in srgb, var(--chrome-accent, #f3a5b6) 55%, transparent),
+    0 6px 20px rgba(0,0,0,0.6),
+    0 0 0 1px rgba(255,255,255,0.06) inset;
+  transform: scale(1.06);
+}
+.qa-fab:active {
+  transform: scale(0.94);
+}
+.qa-fab--open {
+  background: color-mix(in srgb, var(--chrome-accent, #f3a5b6) 22%, transparent);
+  border-color: var(--chrome-accent, #f3a5b6);
+  box-shadow:
+    0 0 32px -4px color-mix(in srgb, var(--chrome-accent, #f3a5b6) 60%, transparent),
+    0 6px 20px rgba(0,0,0,0.6);
+}
+
+/* Icon cross-fade: + ↔ × */
+.qa-fab__icon {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.qa-fab__icon--plus  { opacity: 1; transform: rotate(0deg) scale(1); }
+.qa-fab__icon--close { opacity: 0; transform: rotate(-90deg) scale(0.6); }
+
+.qa-fab--open .qa-fab__icon--plus  { opacity: 0; transform: rotate(90deg) scale(0.6); }
+.qa-fab--open .qa-fab__icon--close { opacity: 1; transform: rotate(0deg) scale(1); }
+
+/* Eternal breath ring */
+.qa-fab__ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--chrome-accent, #f3a5b6) 25%, transparent);
+  animation: qaFabBreath 4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes qaFabBreath {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50%      { opacity: 0.7; transform: scale(1.06); }
+}
+.qa-fab--open .qa-fab__ring {
+  animation: none;
+  opacity: 0;
+}
+
+/* Ripple effect on FAB click */
+.qa-fab::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, transparent 70%);
+  opacity: 0;
+  transform: scale(0);
+  transition: none;
+}
+.qa-fab:active::after {
+  opacity: 1;
+  transform: scale(2.5);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .qa-item,
+  .qa-fab,
+  .qa-fab__icon,
+  .qa-fab__ring { animation: none !important; transition: none !important; }
+  .qa-items--open .qa-item { opacity: 1; transform: none; }
+}

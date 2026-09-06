@@ -629,10 +629,14 @@ export function Cinematic3DScroll() {
         precision mediump float;
         varying vec3 vCol; varying float vA; uniform float uOpacity;
         void main(){
-          vec2 q=gl_PointCoord-vec2(0.5);
-          float d=length(q);
-          float a=smoothstep(0.5,0.08,d)+smoothstep(0.14,0.0,d)*0.7;
-          gl_FragColor=vec4(vCol,a*vA*uOpacity);
+          vec2 q = gl_PointCoord - vec2(0.5);
+          float d = length(q);
+          if (d > 0.5) discard;
+          float inner = smoothstep(0.18, 0.0, d) * 0.95;
+          float mid = smoothstep(0.42, 0.06, d) * 0.65;
+          float outer = smoothstep(0.5, 0.16, d) * 0.25;
+          float a = inner + mid + outer;
+          gl_FragColor = vec4(vCol, a * vA * uOpacity);
         }
       `;
 
@@ -993,30 +997,86 @@ export function Cinematic3DScroll() {
             left: 16,
             right: 16,
             background: "rgba(6, 9, 14, 0.95)",
-            backdropFilter: "blur(16px)",
-            border: "1px solid rgba(63, 224, 255, 0.3)",
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(63, 224, 255, 0.35)",
+            borderRadius: 8,
             padding: 20,
             zIndex: 100,
             display: "flex",
             flexDirection: "column",
-            gap: 14,
-            boxShadow: "0 20px 50px rgba(0,0,0,0.8)"
+            gap: 12,
+            boxShadow: "0 20px 50px rgba(0,0,0,0.9)"
           }}
         >
-          <div className="text-[10px] font-mono tracking-widest text-slate-400 uppercase border-b border-slate-800 pb-2">
-            Navigation Jump
+          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span className="text-[10px] font-mono tracking-widest text-cyan-400 uppercase font-semibold">
+              SCENE NAVIGATOR ({String(curSceneIdx + 1).padStart(2, "0")}/{String(SCENES.length).padStart(2, "0")})
+            </span>
+            <span className="text-[10px] font-mono text-slate-500">NPC-402 PROTOCOL</span>
           </div>
-          <button className="text-left font-mono text-xs text-white hover:text-cyan-400 py-1" onClick={() => scrollToScene(0)}>01 — STORY</button>
-          <button className="text-left font-mono text-xs text-white hover:text-cyan-400 py-1" onClick={() => scrollToScene(4)}>05 — MEMORY</button>
-          <button className="text-left font-mono text-xs text-white hover:text-cyan-400 py-1" onClick={() => scrollToScene(8)}>09 — PROTOCOL</button>
-          <button className="text-left font-mono text-xs text-white hover:text-cyan-400 py-1" onClick={() => scrollToScene(14)}>15 — UNIVERSE</button>
-          <button className="text-left font-mono text-xs text-white hover:text-cyan-400 py-1" onClick={() => scrollToScene(16)}>17 — PLAYGROUND</button>
-          <Link href="/dashboard" className="font-mono text-xs text-amber-400 font-bold border-t border-slate-800 pt-3 flex items-center justify-between">
-            <span>CONSOLE DASHBOARD</span>
-            <span>▸</span>
-          </Link>
+          <div className="grid grid-cols-2 gap-2 py-1 max-h-[48vh] overflow-y-auto">
+            {SCENES.map((s, idx) => (
+              <button 
+                key={s.id} 
+                className={`text-left font-mono text-[11px] p-2 rounded transition-all flex items-center justify-between border ${
+                  curSceneIdx === idx 
+                    ? "text-cyan-300 bg-cyan-950/40 border-cyan-400/50" 
+                    : "text-slate-300 bg-slate-900/40 border-slate-800/80 hover:text-white hover:border-slate-700"
+                }`}
+                onClick={() => scrollToScene(idx)}
+              >
+                <span className="truncate">{String(idx + 1).padStart(2, "0")} {s.name}</span>
+                {curSceneIdx === idx && <span className="text-cyan-400 text-xs">●</span>}
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-col gap-2 pt-2 border-t border-slate-800">
+            <Link 
+              href="/omnivoice" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="font-mono text-xs text-cyan-400 hover:text-cyan-300 font-bold p-2 bg-cyan-950/30 border border-cyan-500/30 rounded flex items-center justify-between"
+            >
+              <span>🎙️ OMNIVOICE NEURAL STUDIO</span>
+              <span>▸</span>
+            </Link>
+            <Link 
+              href="/dashboard" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="font-mono text-xs text-amber-400 hover:text-amber-300 font-bold p-2 bg-amber-950/30 border border-amber-500/30 rounded flex items-center justify-between"
+            >
+              <span>⚡ CONSOLE DASHBOARD</span>
+              <span>▸</span>
+            </Link>
+          </div>
         </div>
       )}
+
+      {/* Mobile Scene Navigation Quick-Bar */}
+      <div 
+        className="md:hidden fixed bottom-14 left-4 right-4 z-40 flex items-center justify-between p-2 rounded-lg bg-black/80 backdrop-blur-md border border-cyan-500/30 shadow-lg"
+      >
+        <button
+          onClick={() => scrollToScene(Math.max(0, curSceneIdx - 1))}
+          disabled={curSceneIdx === 0}
+          className="font-mono text-[11px] px-3 py-1.5 bg-slate-900/80 border border-slate-700 rounded text-slate-200 disabled:opacity-30 active:bg-cyan-950"
+        >
+          ◀ PREV
+        </button>
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="font-mono text-[11px] text-cyan-400 px-2 py-1 truncate max-w-[150px] font-semibold flex items-center gap-1.5"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+          {String(curSceneIdx + 1).padStart(2, "0")} · {SCENES[curSceneIdx]?.name}
+        </button>
+        <button
+          onClick={() => scrollToScene(Math.min(SCENES.length - 1, curSceneIdx + 1))}
+          disabled={curSceneIdx === SCENES.length - 1}
+          className="font-mono text-[11px] px-3 py-1.5 bg-slate-900/80 border border-slate-700 rounded text-slate-200 disabled:opacity-30 active:bg-cyan-950"
+        >
+          NEXT ▶
+        </button>
+      </div>
 
       {/* Chapter Rail */}
       <nav id="rail">

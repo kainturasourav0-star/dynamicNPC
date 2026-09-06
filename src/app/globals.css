@@ -30,6 +30,10 @@
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+.font-display { font-family: var(--font-display) !important; }
+.font-mono { font-family: var(--font-mono) !important; }
+.font-sans { font-family: var(--font-body) !important; }
+
 /* ═══════════════════════════════════════════════════════════════
    BASE
    ═══════════════════════════════════════════════════════════════ */
@@ -1499,5 +1503,82 @@ canvas#gl {
   .chapter { padding: 0 8vw; }
   #bottombar { padding: 16px 18px; }
   #progline { width: 26vw; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INDEX.HTML DASHBOARD THEME
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --ih-bg: #060A13;
+  --ih-surface: #0C1322;
+  --ih-surface-2: #101A2E;
+  --ih-surface-3: #14203a;
+  --ih-border: rgba(148,163,184,.10);
+  --ih-border-strong: rgba(148,163,184,.20);
+  --ih-text: #E8EEF9;
+  --ih-text-2: #9AA8C0;
+  --ih-text-3: #5E6E89;
+  --ih-cyan: #35E0F5;
+  --ih-cyan-dim: rgba(53,224,245,.11);
+  --ih-violet: #9A8CFF;
+  --ih-violet-dim: rgba(154,140,255,.12);
+  --ih-green: #3DDC97;
+  --ih-green-dim: rgba(61,220,151,.11);
+  --ih-amber: #FFC454;
+  --ih-amber-dim: rgba(255,196,84,.12);
+  --ih-red: #FF6B81;
+  --ih-red-dim: rgba(255,107,129,.12);
+}
+
+.ih-card {
+  background: linear-gradient(180deg, rgba(19,27,46,.55), rgba(11,16,29,.85));
+  border: 1px solid rgba(148,163,184,.10);
+  border-radius: 16px;
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+.ih-card-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(53,224,245,.26);
+  box-shadow: 0 14px 34px -18px rgba(0,0,0,.8), 0 0 0 1px rgba(53,224,245,.06);
+}
+.pulse-dot-green {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3DDC97;
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.pulse-dot-green::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1.5px solid #3DDC97;
+  opacity: .6;
+  animation: ih-pulse 1.8s ease-out infinite;
+}
+.pulse-dot-cyan {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #35E0F5;
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.pulse-dot-cyan::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1.5px solid #35E0F5;
+  opacity: .6;
+  animation: ih-pulse 1.8s ease-out infinite;
+}
+@keyframes ih-pulse {
+  0% { transform: scale(.5); opacity: .8; }
+  100% { transform: scale(1.6); opacity: 0; }
 }
 

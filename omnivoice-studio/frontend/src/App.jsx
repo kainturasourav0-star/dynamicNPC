@@ -24,6 +24,7 @@ const VoiceGallery = lazy(() => import('./pages/VoiceGallery'));
 const DonatePage = lazy(() => import('./pages/DonatePage'));
 const EnterprisePage = lazy(() => import('./pages/EnterprisePage'));
 const TranscriptionsPage = lazy(() => import('./pages/Transcriptions'));
+const QuickActions = lazy(() => import('./components/QuickActions'));
 
 import Header from './components/Header';
 import NavRail from './components/NavRail';
@@ -854,7 +855,7 @@ function App() {
 
       <NavRail mode={mode} setMode={setMode} side={navRailSide} onFlipSide={flipNavRailSide} />
 
-      <div className="main-content">
+      <div className="main-content" key={mode} data-mode={mode} style={{ animation: 'pageSlideIn 0.22s cubic-bezier(0.4,0,0.2,1) both' }}>
 
         {/* ═══ LAUNCHPAD TAB ═══ */}
         {mode === 'settings' ? (
@@ -1117,6 +1118,11 @@ function App() {
       )}
 
 
+
+      {/* ═══ QUICK ACTIONS FAB ═══ */}
+      <Suspense fallback={null}>
+        <QuickActions setMode={setMode} setIsCompareModalOpen={setIsCompareModalOpen} />
+      </Suspense>
 
       {/* ═══ BOTTOM LOGS PANEL (VSCode-style) ═══ */}
       <Suspense fallback={null}>

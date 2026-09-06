@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Scale, Fingerprint, Wand2, Film, Lock,
+  Scale, Fingerprint, Wand2, Film, Lock, Mic, Video, Clock,
 } from 'lucide-react';
 import { API } from '../api/client';
 import ReadinessChecklist from '../components/ReadinessChecklist';
@@ -20,29 +20,45 @@ function DubThumb({ jobId, fallback }) {
   );
 }
 
-// Squiggle was replaced by the .lp-hero__sweep span — a pure-CSS animated
-// accent line under the H1. Less static, no SVG dependency.
-
 /**
- * ActionCard — the three big Launchpad tiles. Reads its accent from a
- * single `--card-hue` var so the CSS derives background / border / glow /
- * spotlight from one hex color. Cursor-tracking spotlight: pointer events
- * set --mx/--my so `.lp-glow-layer` can paint a radial gradient at the
- * cursor position. Eternal breath ring lives on `.lp-glow-layer::after`
- * and pulses forever whether the card is hovered or not.
+ * ActionCard — 3D perspective tilt on hover, cursor-tracked spotlight,
+ * eternal breath ring. Reads its accent from `--card-hue`.
  */
 function ActionCard({ hue, Icon, title, accent, count, onClick, children }) {
-  const handleMouseMove = (e) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    e.currentTarget.style.setProperty('--mx', `${e.clientX - r.left}px`);
-    e.currentTarget.style.setProperty('--my', `${e.clientY - r.top}px`);
-  };
+  const cardRef = React.useRef(null);
+
+  const handleMouseMove = useCallback((e) => {
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    const mx = e.clientX - r.left;
+    const my = e.clientY - r.top;
+    const cx = r.width / 2;
+    const cy = r.height / 2;
+
+    // Tilt — clamped to ±10deg
+    const rotX = ((my - cy) / cy) * -8;
+    const rotY = ((mx - cx) / cx) * 8;
+
+    el.style.setProperty('--mx', `${mx}px`);
+    el.style.setProperty('--my', `${my}px`);
+    el.style.setProperty('--rot-x', `${rotX}deg`);
+    el.style.setProperty('--rot-y', `${rotY}deg`);
+  }, []);
+
+  const handleMouseLeave = useCallback((e) => {
+    const el = e.currentTarget;
+    el.style.setProperty('--rot-x', '0deg');
+    el.style.setProperty('--rot-y', '0deg');
+  }, []);
+
   return (
     <button
+      ref={cardRef}
       type="button"
       className="lp-action-card lp-animate lp-glow-card"
       onClick={onClick}
       onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       style={{ '--card-hue': hue }}
     >
       <span className="lp-glow-layer" aria-hidden="true" />
@@ -58,6 +74,19 @@ function ActionCard({ hue, Icon, title, accent, count, onClick, children }) {
   );
 }
 
+/**
+ * QuickStat — small metric chip shown in the hero area.
+ */
+function QuickStat({ icon: Icon, value, label, hue }) {
+  return (
+    <div className="lp-stat" style={{ '--stat-hue': hue }}>
+      <span className="lp-stat__icon"><Icon size={12} /></span>
+      <span className="lp-stat__value">{value}</span>
+      <span className="lp-stat__label">{label}</span>
+    </div>
+  );
+}
+
 export default function Launchpad({
   profiles, studioProjects, dubHistory,
   setMode, setIsCompareModalOpen, handleSelectProfile, loadProject,
@@ -67,11 +96,12 @@ export default function Launchpad({
   const designProfiles = profiles.filter(p => !!p.instruct);
   const demoProfile = profiles.find(p => p.id === 'demo0001');
 
+  const totalVoices = profiles.length;
+  const totalDubs = (studioProjects.length || 0) + (dubHistory?.length || 0);
+
   return (
     <div className="launchpad">
-      {/* Ambient backdrop — chrome-accent aurora that drifts forever. Lives
-          behind everything at z=0, contributes the "eternal glow" the user
-          asked for without painting any one surface. */}
+      {/* Ambient aurora backdrop */}
       <div className="lp-aurora" aria-hidden="true">
         <span className="lp-aurora__blob lp-aurora__blob--pink" />
         <span className="lp-aurora__blob lp-aurora__blob--green" />
@@ -89,9 +119,6 @@ export default function Launchpad({
                     key={i}
                     className="lp-wave-bar"
                     style={{
-                      // Per-bar animation offsets + distinct durations give
-                      // a breathing, never-identical pulse instead of the
-                      // rigid uniform bounce the old version had.
                       '--bar-h': `${h}px`,
                       '--bar-delay': `${i * 0.17}s`,
                       '--bar-dur':   `${1.8 + (i % 3) * 0.4}s`,
@@ -110,6 +137,34 @@ export default function Launchpad({
               Clone a voice, design a new one, or dub a video into any of <span className="lp-pill">{t('common.languages_count')}</span>.
               Built for creators who care how it sounds.
             </p>
+
+            {/* Quick stats row */}
+            {(totalVoices > 0 || totalDubs > 0) && (
+              <div className="lp-stats-row">
+                {totalVoices > 0 && (
+                  <QuickStat
+                    icon={Mic}
+                    value={totalVoices}
+                    label={totalVoices === 1 ? 'Voice' : 'Voices'}
+                    hue="#d3869b"
+                  />
+                )}
+                {totalDubs > 0 && (
+                  <QuickStat
+                    icon={Video}
+                    value={totalDubs}
+                    label={totalDubs === 1 ? 'Project' : 'Projects'}
+                    hue="#fe8019"
+                  />
+                )}
+                <QuickStat
+                  icon={Clock}
+                  value="Local"
+                  label="No Cloud"
+                  hue="#8ec07c"
+                />
+              </div>
+            )}
           </div>
           <button
             onClick={() => setIsCompareModalOpen(true)}
@@ -119,7 +174,6 @@ export default function Launchpad({
             <Scale size={12} /> {t('launchpad.ab_compare')}
           </button>
         </div>
-
       </div>
 
       {/* Action Cards */}
@@ -225,20 +279,45 @@ export default function Launchpad({
       {profiles.length === 0 && studioProjects.length === 0 && (
         <div className="lp-empty">
           <div className="lp-empty__inner">
-            <div className="lp-empty__bars">
-              {[8, 14, 22, 18, 26, 14, 20, 10, 16].map((h, i) => (
-                <span
-                  key={i}
-                  className="lp-wave-bar"
-                  style={{
-                    height: h, background: '#665c54', animationDelay: `${i * 0.12}s`,
-                  }}
-                />
-              ))}
+            {/* Animated waveform rings */}
+            <div className="lp-empty__visual" aria-hidden="true">
+              <span className="lp-empty__ring lp-empty__ring--1" />
+              <span className="lp-empty__ring lp-empty__ring--2" />
+              <span className="lp-empty__ring lp-empty__ring--3" />
+              <div className="lp-empty__bars">
+                {[8, 14, 22, 18, 26, 14, 20, 10, 16].map((h, i) => (
+                  <span
+                    key={i}
+                    className="lp-wave-bar"
+                    style={{
+                      height: h,
+                      '--bar-h': `${h}px`,
+                      '--bar-delay': `${i * 0.12}s`,
+                      '--bar-dur': `${1.8 + (i % 3) * 0.4}s`,
+                    }}
+                  />
+                ))}
+              </div>
             </div>
             <p className="lp-empty__hint">
               {t('launchpad.empty_hint')}
             </p>
+            <div className="lp-empty__ctas">
+              <button
+                className="lp-empty__cta lp-empty__cta--primary"
+                onClick={() => setMode('clone')}
+              >
+                <Fingerprint size={14} />
+                Clone a Voice
+              </button>
+              <button
+                className="lp-empty__cta"
+                onClick={() => setMode('dub')}
+              >
+                <Film size={14} />
+                Dub a Video
+              </button>
+            </div>
           </div>
           <ReadinessChecklist showWhenAllPass />
         </div>

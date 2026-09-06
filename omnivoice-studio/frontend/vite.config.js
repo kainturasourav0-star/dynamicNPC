@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 import { readFileSync } from 'fs'
 
-const pkg = JSON.parse(readFileSync(path.resolve(__dirname, 'package.json'), 'utf-8'));
+const pkg = JSON.parse(readFileSync(path.resolve(import.meta.dirname, 'package.json'), 'utf-8'));
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -16,7 +16,7 @@ export default defineConfig({
   resolve: {
     preserveSymlinks: false,
     alias: {
-      '@tauri-apps/plugin-dialog': path.resolve(__dirname, 'node_modules/@tauri-apps/plugin-dialog/dist-js/index.js'),
+      '@tauri-apps/plugin-dialog': path.resolve(import.meta.dirname, 'node_modules/@tauri-apps/plugin-dialog/dist-js/index.js'),
     },
   },
   server: {

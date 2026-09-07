@@ -10,7 +10,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || FALLBACK_CLERK_KEY;
 
   return (
-    <ClerkProvider appearance={{ baseTheme: dark } as any} publishableKey={publishableKey}>
+    <ClerkProvider
+      appearance={{ baseTheme: dark } as any}
+      publishableKey={publishableKey}
+      signInUrl="/sign-in"
+      signUpUrl="/signup"
+      afterSignInUrl="/dashboard"
+      afterSignUpUrl="/dashboard"
+    >
       {children}
     </ClerkProvider>
   );
